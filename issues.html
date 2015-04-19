@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Explore by Issue</title>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet">
+    <link href="frontend/style.css" rel="stylesheet">
+    <style>
+    body {
+      font: 10px sans-serif;
+    }
+    .axis path,
+    .axis line {
+      fill: none;
+      stroke: #000;
+      shape-rendering: crispEdges;
+    }
+    .x.axis path {
+      display: none;
+    }
+    .line {
+      fill: none;
+      stroke: steelblue;
+      stroke-width: 1.5px;
+    }
+    </style>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+      <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+      <script src="js/typeahead.bundle.js"></script>
+  </head>
+
+  <body>
+
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">Supreme Court Analytics &amp; Visualizations</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+        </div><!--/.navbar-collapse -->
+      </div>
+    </nav>
+    <br><br>
+    <div class="container center"><h2>This page should allow people to see how <em>often</em> two justices voted the same way on a certain issue. Input: two justices, one issue. Data way too big right now.<h2>
+    <div class="container center" id="get-name">
+      <input class="typeahead form-control" type="text" placeholder="Enter Last Name">
+    </div>
+    <br>
+    <div class="container">
+      <script src="http://d3js.org/d3.v3.js"></script>
+      <script src="js/issues.js"></script>
+    </div>	
+
+      <br>
+      <hr>
+
+      <footer class="text-left">
+        <p>By <a href="http://github.com/gbrown05" target="_blank">George Brown</a> and <a href="http://github.com/stom01" target="_blank">Skyler Tom</a>, Spring 2015</p>
+      </footer>
+    </div>
+  </body>
+</html>
