@@ -1,9 +1,4 @@
 // Graph a justice's votes by issue
-var margin = {top: 20, right: 20, bottom: 30, left: 50},
-    width = 960 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom;
-
-// var parseDate = d3.time.format("%y").parse;
 
 var issueKeys = {1:"Criminal Procedure",
 2:"Civil Rights",
@@ -20,6 +15,22 @@ var issueKeys = {1:"Criminal Procedure",
 13:"Miscellaneous",
 14:"Private Action"}
 
+data = [];
+var margin = {top: 20, right: 50, bottom: 30, left: 50},
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+//var parseDate = d3.time.format("%d-%b-%y").parse,
+var parseDate = d3.time.format("%Y").parse,
+    bisectDate = d3.bisector(function(d) { return d.date; }).left,
+    //CHANGE: this is what it will print out on hover for y axis
+    formatValue = d3.format(",.2f"),
+    formatCurrency = function(d) { return "$" + formatValue(d); },
+    formatHoverText = function (d) {
+      return "Voted in the Majority " + d.vote + " times out of " +
+        d.totalvotes + " cases";
+    };
+
 var x = d3.time.scale()
     .range([0, width]);
 
@@ -35,7 +46,7 @@ var yAxis = d3.svg.axis()
     .orient("left");
 
 var line = d3.svg.line()
-    .x(function(d) { return x(d.term); })
+    .x(function(d) { return x(d.date); })
     .y(function(d) { return y(d.vote); });
 
 var svg = d3.select("body").append("svg")
@@ -43,18 +54,46 @@ var svg = d3.select("body").append("svg")
     .attr("height", height + margin.top + margin.bottom)
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-d3.csv("data/justice-centered/SCDB_2014_01_justiceCentered_Vote.csv", function(error, data) {
-  data.forEach(function(d) {
-  	// if(inputname == d.justiceName) {
-	    d.term = +d.term;
-	    d.vote = +d.vote;
-	    d.issue = issueKeys[d.issueArea];
-	    d.justice = +d.justiceName
-	// }
+
+//d3.csv("data/justice-centered/SCDB_2014_01_justiceCentered_Vote.csv", function(error, data) {
+d3.csv("data/justice-centered/SCDB_2014_01_justiceCentered_Vote.csv", function(error, csv_data) {
+  csv_data.forEach(function(d) {
+    d.term = parseDate(d.term);
+    if (d.justiceName == "TMarshall"){ 
+    if (data.length == 0) {
+      var sccase = new Object();
+      sccase.date = d.term;
+      if (d.vote == 1 || d.vote == 3 || d.vote == 4) //only count consents
+        sccase.vote = 1;
+      else sccase.vote = 0;
+      sccase.totalvotes = 1;
+      data.push(sccase);
+    }
+    else if (data[data.length-1].date.getTime() != d.term.getTime()) {
+      var sccase = new Object();
+      sccase.date = d.term;
+      if (d.vote == 1 || d.vote == 3 || d.vote == 4) //only count consents
+        sccase.vote = 1;
+      else sccase.vote = 0;
+      sccase.totalvotes = 1;
+      data.push(sccase);
+    }
+    else {
+      d.vote = +d.vote;
+      if (d.vote == 1 || d.vote == 3 || d.vote == 4) //only count consents
+        data[data.length-1].vote += 1;
+      data[data.length-1].totalvotes += 1;
+    }
+  }
   });
 
-  x.domain(d3.extent(data, function(d) { return d.term; }));
-  y.domain(d3.extent(data, function(d) { return d.vote; })); //TODO: needs to be sum of votes
+  data.sort(function(a, b) {
+    return a.date - b.date;
+  });
+
+  x.domain([data[0].date, data[data.length - 1].date]);
+  //y.domain(d3.extent(data, function(d) { return d.close; }));
+  y.domain(d3.extent(data, function(d) { return d.vote; }));
 
   svg.append("g")
       .attr("class", "x axis")
@@ -75,4 +114,33 @@ d3.csv("data/justice-centered/SCDB_2014_01_justiceCentered_Vote.csv", function(e
       .datum(data)
       .attr("class", "line")
       .attr("d", line);
+
+  var focus = svg.append("g")
+      .attr("class", "focus")
+      .style("display", "none");
+
+  focus.append("circle")
+      .attr("r", 4.5);
+
+  focus.append("text")
+      .attr("x", 9)
+      .attr("dy", ".35em");
+
+  svg.append("rect")
+      .attr("class", "overlay")
+      .attr("width", width)
+      .attr("height", height)
+      .on("mouseover", function() { focus.style("display", null); })
+      .on("mouseout", function() { focus.style("display", "none"); })
+      .on("mousemove", mousemove);
+
+  function mousemove() {
+    var x0 = x.invert(d3.mouse(this)[0]),
+        i = bisectDate(data, x0, 1),
+        d0 = data[i - 1],
+        d1 = data[i],
+        d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+    focus.attr("transform", "translate(" + x(d.date) + "," + y(d.vote) + ")");
+    focus.select("text").text(formatHoverText(d));
+  }
 });
