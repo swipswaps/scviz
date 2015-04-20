@@ -26,17 +26,49 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="/">Supreme Court Analytics &amp; Visualizations</a>
+          <a class="navbar-brand" href="/scviz">Supreme Court Analytics &amp; Visualizations</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
         </div><!--/.navbar-collapse -->
       </div>
     </nav>
     <br><br>
-    <div class="container center"><h2>This page should allow people to see how <em>often</em> two justices voted the same way on a certain issue. Input: two justices, one issue. Data way too big right now.<h2>
-    <div class="container center" id="get-name">
-      <input class="typeahead form-control" type="text" placeholder="Enter Last Name">
+<!--     <form class="form-inline">
+      <div class="form-group">
+        <label for="justiceone">Justice #1:</label>
+        <input type="text" class="form-control" id="justiceone" placeholder="Warren">
+      </div>
+      <div class="form-group">
+        <label for="justicetwo">Justice #2:</label>
+        <input type="text" class="form-control" id="justiceone" placeholder="Marshall">
+      </div>
+    </form> -->
+    <div class="col-md-4">
+      <div class="input-group">
+          <input class="typeahead form-control" type="text" placeholder="Enter Last Name">
+        </div>
     </div>
+    <div class="col-md-4">
+      <div class="input-group">
+        <input class="typeahead form-control" type="text" placeholder="Enter Last Name">
+      </div>
+    </div>
+  <div class="col-md-4">
+    <div class="input-group">
+      <input type="text" class="form-control" placeholder="Select an Issue">
+      <div class="input-group-btn">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">Select...<span class="caret"></span></button>
+        <ul class="dropdown-menu dropdown-menu-right" role="menu">
+          <li><a href="#">First Amendment</a></li>
+          <li><a href="#">Civil Rights</a></li>
+          <li><a href="#">Due Process</a></li>
+          <li class="divider"></li>
+          <li><a href="#">All</a></li>
+        </ul>
+      </div><!-- /btn-group -->
+    </div><!-- /input-group -->
+  </div><!-- /.col-lg-6 -->
+</div><!-- /.row -->
     <br>
     <div class="container">
       <script src="http://d3js.org/d3.v3.js"></script>
@@ -46,8 +78,10 @@
       <br>
       <hr>
 
-      <footer class="text-left">
-        <p>By <a href="http://github.com/gbrown05" target="_blank">George Brown</a> and <a href="http://github.com/stom01" target="_blank">Skyler Tom</a>, Spring 2015</p>
+      <footer class="footer">
+        <div class="container">
+          <h5 class="text-muted">By <a href="http://github.com/gbrown05" target="_blank">George Brown</a> and <a href="http://github.com/stom01" target="_blank">Skyler Tom</a>, Spring 2015</h5>
+        </div>
       </footer>
     </div>
   </body>
