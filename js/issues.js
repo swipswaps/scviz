@@ -72,33 +72,33 @@ var svg = d3.select("body").append("svg")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 d3.csv("data/justice-centered/SCDB_2014_01_justiceCentered_Vote.csv", function(error, csv_data) {
+targetJustice = "TMarshall";
   csv_data.forEach(function(d) {
     d.term = parseDate(d.term);
-    if (d.justiceName == "TMarshall"){ 
-      if (data.length == 0) {
-        var sccase = new Object();
-        sccase.date = d.term;
-        if (d.vote == 1 || d.vote == 3 || d.vote == 4) //only count consents
-          sccase.vote = 1;
-        else sccase.vote = 0;
-        sccase.totalvotes = 1;
-        data.push(sccase);
-      }
-      else if (data[data.length-1].date.getTime() != d.term.getTime()) {
-        var sccase = new Object();
-        sccase.date = d.term;
-        if (d.vote == 1 || d.vote == 3 || d.vote == 4) //only count consents
-          sccase.vote = 1;
-        else sccase.vote = 0;
-        sccase.totalvotes = 1;
-        data.push(sccase);
-      }
-      else {
-        d.vote = +d.vote;
-        if (d.vote == 1 || d.vote == 3 || d.vote == 4) //only count consents
-          data[data.length-1].vote += 1;
-        data[data.length-1].totalvotes += 1;
-      }
+    if (d.justiceName !== targetJustice) return 1;
+    if (data.length == 0) {
+      var sccase = new Object();
+      sccase.date = d.term;
+      if (d.vote == 1 || d.vote == 3 || d.vote == 4) //only count consents
+        sccase.vote = 1;
+      else sccase.vote = 0;
+      sccase.totalvotes = 1;
+      data.push(sccase);
+    }
+    else if (data[data.length-1].date.getTime() != d.term.getTime()) {
+      var sccase = new Object();
+      sccase.date = d.term;
+      if (d.vote == 1 || d.vote == 3 || d.vote == 4) //only count consents
+        sccase.vote = 1;
+      else sccase.vote = 0;
+      sccase.totalvotes = 1;
+      data.push(sccase);
+    }
+    else {
+      d.vote = +d.vote;
+      if (d.vote == 1 || d.vote == 3 || d.vote == 4) //only count consents
+        data[data.length-1].vote += 1;
+      data[data.length-1].totalvotes += 1;
     }
   });
 
@@ -162,36 +162,37 @@ d3.csv("data/justice-centered/SCDB_2014_01_justiceCentered_Vote.csv", function(e
 // ** Update data section (Called from the onclick)
 function updateData() {
     targetJustice = $("#get-name").val();
+    targetissue = issueKeys[$("#dropdownMenu1").text()];
     data = [];
     // Get the data again
     d3.csv("data/justice-centered/SCDB_2014_01_justiceCentered_Vote.csv", function(error, csv_data) {
       csv_data.forEach(function(d) {
         d.term = parseDate(d.term);
-        if (d.justiceName == targetJustice){ 
-          if (data.length == 0) {
-            var sccase = new Object();
-            sccase.date = d.term;
-            if (d.vote == 1 || d.vote == 3 || d.vote == 4) //only count consents
-              sccase.vote = 1;
-            else sccase.vote = 0;
-            sccase.totalvotes = 1;
-            data.push(sccase);
-          }
-          else if (data[data.length-1].date.getTime() != d.term.getTime()) {
-            var sccase = new Object();
-            sccase.date = d.term;
-            if (d.vote == 1 || d.vote == 3 || d.vote == 4) //only count consents
-              sccase.vote = 1;
-            else sccase.vote = 0;
-            sccase.totalvotes = 1;
-            data.push(sccase);
-          }
-          else {
-            d.vote = +d.vote;
-            if (d.vote == 1 || d.vote == 3 || d.vote == 4) //only count consents
-              data[data.length-1].vote += 1;
-            data[data.length-1].totalvotes += 1;
-          }
+        if (d.justiceName !== targetJustice) return 1;
+        if (targetissue != null && targetissue != +d.issueArea) return 1;
+        if (data.length == 0) {
+          var sccase = new Object();
+          sccase.date = d.term;
+          if (d.vote == 1 || d.vote == 3 || d.vote == 4) //only count consents
+            sccase.vote = 1;
+          else sccase.vote = 0;
+          sccase.totalvotes = 1;
+          data.push(sccase);
+        }
+        else if (data[data.length-1].date.getTime() != d.term.getTime()) {
+          var sccase = new Object();
+          sccase.date = d.term;
+          if (d.vote == 1 || d.vote == 3 || d.vote == 4) //only count consents
+            sccase.vote = 1;
+          else sccase.vote = 0;
+          sccase.totalvotes = 1;
+          data.push(sccase);
+        }
+        else {
+          d.vote = +d.vote;
+          if (d.vote == 1 || d.vote == 3 || d.vote == 4) //only count consents
+            data[data.length-1].vote += 1;
+          data[data.length-1].totalvotes += 1;
         }
       });
 
