@@ -34,18 +34,47 @@
     </nav>
     <br><br>
     <div class="container center"><h2>This page should allow people to see how <em>often</em> two justices voted the same way on a certain issue. Input: two justices, one issue. Data way too big right now.<h2>
-    <div class="container center" id="get-name">
-      <input class="typeahead form-control" type="text" placeholder="Enter Last Name">
+    <div class="container center" >
+      <input class="typeahead form-control" type="text" id="get-name" placeholder="Enter Last Name">
+    </div>
+    <div class="container center" >
+      <input class="typeahead form-control" type="text" id="get-name2" placeholder="Enter 2nd Justice's Last Name">
+    </div>
+    <div class="container center" id="get-issue">
+      <div class="dropdown">
+        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">
+
+          Choose an issue to filter(or defaults all issues)
+          <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1" id="dropdownList">
+          <li role="presentation"><a role="menuitem" tabindex="0" href="#">All Issues</a></li>
+          <li role="presentation"><a role="menuitem" tabindex="1" href="#">Criminal Procedure</a></li>
+          <li role="presentation"><a role="menuitem" tabindex="2" href="#">Civil Rights</a></li>
+          <li role="presentation"><a role="menuitem" tabindex="3" href="#">First Amendment</a></li>
+          <li role="presentation"><a role="menuitem" tabindex="4" href="#">Due Process</a></li>
+          <li role="presentation"><a role="menuitem" tabindex="5" href="#">Privacy</a></li>
+          <li role="presentation"><a role="menuitem" tabindex="6" href="#">Attourneys</a></li>
+          <li role="presentation"><a role="menuitem" tabindex="7" href="#">Unions</a></li>
+          <li role="presentation"><a role="menuitem" tabindex="8" href="#">Economic Activity</a></li>
+          <li role="presentation"><a role="menuitem" tabindex="9" href="#">Judicial Power</a></li>
+          <li role="presentation"><a role="menuitem" tabindex="10" href="#">Federalism</a></li>
+          <li role="presentation"><a role="menuitem" tabindex="11" href="#">Interstate Relations</a></li>
+          <li role="presentation"><a role="menuitem" tabindex="12" href="#">Federal Taxation</a></li>
+          <li role="presentation"><a role="menuitem" tabindex="13" href="#">Miscellaneous</a></li>
+          <li role="presentation"><a role="menuitem" tabindex="14" href="#">Private Action</a></li>
+        </ul>
+      </div>
     </div>
     <br>
+    <div class="container center" id="visualize">
+      <button type="button" class="btn btn-default" onclick="updateData()">Visualize</button> 
+    </div>
     <div class="container">
       <script src="http://d3js.org/d3.v3.js"></script>
       <script src="js/issues.js"></script>
     </div>	
-
-      <br>
       <hr>
-
       <footer class="text-left">
         <p>By <a href="http://github.com/gbrown05" target="_blank">George Brown</a> and <a href="http://github.com/stom01" target="_blank">Skyler Tom</a>, Spring 2015</p>
       </footer>
