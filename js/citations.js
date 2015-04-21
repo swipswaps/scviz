@@ -3,7 +3,7 @@ var lookingfor;
 testcase = "350 U.S. 568" // replace with user input
 
 queue()
-    .defer(d3.json, "../data/citations/1956.json")
+    .defer(d3.json, "data/citations/1956.json")
     .await(ready);
 
 function ready(error, year) {
