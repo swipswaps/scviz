@@ -5,6 +5,9 @@ $('#dropdownList li').on('click', function() {
     $('#dropdownMenu1').html($(this).html());
     });
 
+var justice_names = ['TMarshall', 'FMVinson'];
+//['AFortas', 'AJGoldberg', 'AMKennedy', 'AScalia', 'BRWhite', 'CEWhittaker', 'CThomas', 'DHSouter', 'EKagan', 'EWarren', 'FFrankfurter', 'FMurphy', 'FMVinson', 'HABlackmun', 'HHBurton', 'HLBlack', 'JGRoberts', 'JHarlan2', 'JPStevens', 'LFPowell', 'PStewart', 'RBGinsburg', 'RHJackson', 'SAAlito', 'SDOConnor', 'SFReed', 'SGBreyer', 'SMinton', 'SSotomayor', 'TCClark', 'TMarshall', 'WBRutledge', 'WEBurger', 'WHRehnquist', 'WJBrennan', 'WODouglas'];
+
 var issueKeys = {
 "Criminal Procedure":1,
 "Civil Rights":2,
@@ -35,7 +38,7 @@ var issueKeys = {
 13:"Miscellaneous",
 14:"Private Action"}
 
-data = [];
+var data = [];
 var margin = {top: 20, right: 50, bottom: 30, left: 50},
     width = 960 - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom;
@@ -52,6 +55,8 @@ var x = d3.time.scale()
 
 var y = d3.scale.linear()
     .range([height, 0]);
+
+var color = d3.scale.category10();
 
 var xAxis = d3.svg.axis()
     .scale(x)
@@ -72,34 +77,46 @@ var svg = d3.select("body").append("svg")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 d3.csv("data/justice-centered/SCDB_2014_01_justiceCentered_Vote.csv", function(error, csv_data) {
-targetJustice = "TMarshall";
+  targetJustice = "TMarshall";
+  target2 = "FMVinson";
+  
   csv_data.forEach(function(d) {
     d.term = parseDate(d.term);
-    if (d.justiceName !== targetJustice) return 1;
-    if (data.length == 0) {
+    d.vote = +d.vote;
+    if (d.justiceName !== targetJustice && d.justiceName !== target2) return 1;
+    if (data.length == 0 || data[data.length-1].date.getTime() != d.term.getTime()) {
       var sccase = new Object();
       sccase.date = d.term;
+      sccase[d.justiceName] = [];
       if (d.vote == 1 || d.vote == 3 || d.vote == 4) //only count consents
-        sccase.vote = 1;
+        sccase[d.justiceName].vote = 1;
       else sccase.vote = 0;
-      sccase.totalvotes = 1;
-      data.push(sccase);
-    }
-    else if (data[data.length-1].date.getTime() != d.term.getTime()) {
-      var sccase = new Object();
-      sccase.date = d.term;
-      if (d.vote == 1 || d.vote == 3 || d.vote == 4) //only count consents
-        sccase.vote = 1;
-      else sccase.vote = 0;
-      sccase.totalvotes = 1;
+      sccase[d.justiceName].totalvotes = 1;
       data.push(sccase);
     }
     else {
-      d.vote = +d.vote;
+      if (data[data.length-1][d.justiceName] == null) {
+        data[data.length-1][d.justiceName] = [];
+        data[data.length-1][d.justiceName].vote = 0;
+        data[data.length-1][d.justiceName].totalvotes = 0;
+      }
       if (d.vote == 1 || d.vote == 3 || d.vote == 4) //only count consents
-        data[data.length-1].vote += 1;
-      data[data.length-1].totalvotes += 1;
+        data[data.length-1][d.justiceName].vote += 1;
+      data[data.length-1][d.justiceName].totalvotes += 1;
     }
+  });
+
+  color.domain(justice_names);
+  justices = color.domain().map(function(name) {
+     return {
+       name: name,
+       values: data.map(function(d) {
+          if (d[name] != null)
+           return {date: d.date, vote: +d[name].vote, totalvotes: +d[name].totalvotes};
+          else
+            return {date: d.date, vote: +0, totalvotes: +0};
+       })
+     };
   });
 
   data.sort(function(a, b) {
@@ -107,7 +124,10 @@ targetJustice = "TMarshall";
   });
 
   x.domain([data[0].date, data[data.length - 1].date]);
-  y.domain(d3.extent(data, function(d) { return d.vote; }));
+  y.domain([
+    d3.min(justices, function(c) { return d3.min(c.values, function(v) { if (v != null)return v.vote; else return 999 }); }),
+    d3.max(justices, function(c) { return d3.max(c.values, function(v) { if (v != null) return v.vote; else return 0; }); })
+  ]);
 
   svg.append("g")
       .attr("class", "x axis")
@@ -124,6 +144,23 @@ targetJustice = "TMarshall";
       .style("text-anchor", "end")
       .text("Times voted with the majority");
 
+  var justice = svg.selectAll(".justice")
+      .data(justices)
+      .enter().append("g")
+      .attr("class", "justice");
+
+  justice.append("path")
+      .attr("class", "line")
+      .attr("d", function(d) { return line(d.values); })
+      .style("stroke", function(d) { if (d.values.vote == 0) return "white";return color(d.name); });
+
+  justice.append("text")
+      .datum(function(d) { return {name: d.name, value: d.values[d.values.length - 1]}; })
+      .attr("transform", function(d) { return "translate(" + x(d.value.date) + "," + y(d.value.vote) + ")"; })
+      .attr("x", 3)
+      .attr("dy", ".35em")
+      .text(function(d) { return d.name; });
+      /*
   svg.append("path")
       .datum(data)
       .attr("class", "line")
@@ -157,6 +194,7 @@ targetJustice = "TMarshall";
     focus.attr("transform", "translate(" + x(d.date) + "," + y(d.vote) + ")");
     focus.select("text").text(formatHoverText(d));
   }
+  */
 });
 
 // ** Update data section (Called from the onclick)
@@ -170,16 +208,7 @@ function updateData() {
         d.term = parseDate(d.term);
         if (d.justiceName !== targetJustice) return 1;
         if (targetissue != null && targetissue != +d.issueArea) return 1;
-        if (data.length == 0) {
-          var sccase = new Object();
-          sccase.date = d.term;
-          if (d.vote == 1 || d.vote == 3 || d.vote == 4) //only count consents
-            sccase.vote = 1;
-          else sccase.vote = 0;
-          sccase.totalvotes = 1;
-          data.push(sccase);
-        }
-        else if (data[data.length-1].date.getTime() != d.term.getTime()) {
+        else if (data.length == 0 || data[data.length-1].date.getTime() != d.term.getTime()) {
           var sccase = new Object();
           sccase.date = d.term;
           if (d.vote == 1 || d.vote == 3 || d.vote == 4) //only count consents
