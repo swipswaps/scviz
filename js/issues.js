@@ -67,6 +67,7 @@ var yAxis = d3.svg.axis()
     .orient("left");
 
 var line = d3.svg.line()
+    .defined(function(d){return d != null && d.vote != null})
     .x(function(d) { return x(d.date); })
     .y(function(d) { return y(d.vote); });
 
@@ -81,20 +82,32 @@ d3.csv("data/justice-centered/SCDB_2014_01_justiceCentered_Vote.csv", function(e
   target2 = "FMVinson";
   
   csv_data.forEach(function(d) {
-    d.term = parseDate(d.term);
+    d.date = parseDate(d.term);
     d.vote = +d.vote;
     if (d.justiceName !== targetJustice && d.justiceName !== target2) return 1;
-    if (data.length == 0 || data[data.length-1].date.getTime() != d.term.getTime()) {
+    if (data.length == 0 || data[data.length-1].date.getTime() != d.date.getTime()) {
+    //if (data.length == 0 || data[d.term] == null) {
       var sccase = new Object();
-      sccase.date = d.term;
+      sccase.date = d.date;
       sccase[d.justiceName] = [];
       if (d.vote == 1 || d.vote == 3 || d.vote == 4) //only count consents
         sccase[d.justiceName].vote = 1;
-      else sccase.vote = 0;
+      else sccase[d.justiceName].vote = 0;
       sccase[d.justiceName].totalvotes = 1;
       data.push(sccase);
+      //data[d.term] = sccase;
     }
     else {
+        /*
+      if (data[d.term][d.justiceName] == null) {
+        data[d.term][d.justiceName] = [];
+        data[d.term][d.justiceName].vote = 0;
+        data[d.term][d.justiceName].totalvotes = 0;
+      }
+      if (d.vote == 1 || d.vote == 3 || d.vote == 4) //only count consents
+        data[d.term][d.justiceName].vote += 1;
+      data[d.term][d.justiceName].totalvotes += 1;
+        */
       if (data[data.length-1][d.justiceName] == null) {
         data[data.length-1][d.justiceName] = [];
         data[data.length-1][d.justiceName].vote = 0;
@@ -114,7 +127,7 @@ d3.csv("data/justice-centered/SCDB_2014_01_justiceCentered_Vote.csv", function(e
           if (d[name] != null)
            return {date: d.date, vote: +d[name].vote, totalvotes: +d[name].totalvotes};
           else
-            return {date: d.date, vote: +0, totalvotes: +0};
+           return {date: d.date, vote: null, totalvotes: null};
        })
      };
   });
@@ -124,6 +137,12 @@ d3.csv("data/justice-centered/SCDB_2014_01_justiceCentered_Vote.csv", function(e
   });
 
   x.domain([data[0].date, data[data.length - 1].date]);
+  /*
+  x.domain([
+    d3.min(justices, function(c) { return d3.min(c.values, function(v) { if (v != null)return v.date; else return 9999 }); }),
+    d3.max(justices, function(c) { return d3.max(c.values, function(v) { if (v != null) return v.date; else return 0; }); })
+  ]);
+  */
   y.domain([
     d3.min(justices, function(c) { return d3.min(c.values, function(v) { if (v != null)return v.vote; else return 999 }); }),
     d3.max(justices, function(c) { return d3.max(c.values, function(v) { if (v != null) return v.vote; else return 0; }); })
@@ -152,7 +171,7 @@ d3.csv("data/justice-centered/SCDB_2014_01_justiceCentered_Vote.csv", function(e
   justice.append("path")
       .attr("class", "line")
       .attr("d", function(d) { return line(d.values); })
-      .style("stroke", function(d) { if (d.values.vote == 0) return "white";return color(d.name); });
+      .style("stroke", function(d) { return color(d.name); });
 
   justice.append("text")
       .datum(function(d) { return {name: d.name, value: d.values[d.values.length - 1]}; })
