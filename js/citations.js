@@ -1,23 +1,47 @@
 var nodes = {};
+var lookingfor;
+testcase = "350 U.S. 568" // replace with user input
 
 queue()
     .defer(d3.json, "../data/citations/1956.json")
     .await(ready);
 
 function ready(error, year) {
-// Compute the distinct nodes from the links.
-  console.log(year)
-  for(var key in year){
-    for(key2 in key){
-      if(key2 == null || key2 === undefined || key2 == 0 || key2 == "0" || key2 == "null"){
-        delete[year[key[key2]]]}
-        console.log("hi")
+links = [];
+// get all cases that a given case, testcase, cites
+  for(key in year[testcase]){
+    if(year[testcase][key] != 1){
+      continue;
+    } else {
+        var temp = {}
+        temp["source"] = testcase
+        temp["target"] = year["Unnamed: 0"][key]
+        temp["type"] = "suit"
+        if(temp["source"] != temp["target"]){       //no case cites itself!!
+          links.push(temp)
+        } else {
+          continue;
+        }
       }
     }
-  console.log(year)
 
-  links = [];
-  links.push(year)
+// get all cases that cite a given case, testcase
+  for(thiscase in year){
+    for(cited in year[thiscase]) {
+      if(year[thiscase][cited] == 1 && year["Unnamed: 0"][cited] == testcase){
+        var temp = {}
+        temp["source"] = year["Unnamed: 0"][cited]
+        temp["target"] = testcase
+        temp["type"] = "licensing"
+        if(temp["source"] != temp["target"]){       //no case cites itself!!
+          links.push(temp)
+        } else {
+          continue;
+        }
+      }
+    }
+  }
+
   links.forEach(function(link) {
     link.source = nodes[link.source] || (nodes[link.source] = {name: link.source});
     link.target = nodes[link.target] || (nodes[link.target] = {name: link.target});
@@ -30,7 +54,7 @@ function ready(error, year) {
       .nodes(d3.values(nodes))
       .links(links)
       .size([width, height])
-      .linkDistance(60)
+      .linkDistance(150)
       .charge(-300)
       .on("tick", tick)
       .start();
@@ -58,19 +82,29 @@ function ready(error, year) {
     .enter().append("path")
       .attr("class", function(d) { return "link " + d.type; })
       .attr("marker-end", function(d) { return "url(#" + d.type + ")"; });
-
+var base = "http://caselaw.lp.findlaw.com/scripts/getcase.pl?court=us&vol=";
+var regg = /\d+/gi;
   var circle = svg.append("g").selectAll("circle")
       .data(force.nodes())
     .enter().append("circle")
       .attr("r", 6)
-      .call(force.drag);
+      .call(force.drag)
+            .on("click", function(d) { 
+        var mystr = d.name;
+        var numlist = mystr.match(regg);
+        console.log(numlist)
+        var url = base + numlist[0] + "&invol=" + numlist[1];
+        window.open(url); });
 
   var text = svg.append("g").selectAll("text")
       .data(force.nodes())
     .enter().append("text")
       .attr("x", 8)
       .attr("y", ".31em")
-      .text(function(d) { return d.name; });
+      .text(function(d) { 
+        return d.name
+      });
+
 
   // Use elliptical arc path segments to doubly-encode directionality.
   function tick() {
