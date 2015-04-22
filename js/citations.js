@@ -1,26 +1,26 @@
 var nodes = {};
 var lookingfor;
-testcase = "315 U.S. 740" // replace with user input
+testcase = "350 U.S. 818" // replace with user input
 
 queue()
-    .defer(d3.json, "data/citations/adjlist.json")
+    .defer(d3.json, "data/citations/adjlist.json") //next, get the master list!
+    .defer(d3.json, "data/citations/mastercaselist.json")
     .await(ready);
 
-function ready(error, bigjson) {
+function ready(error, bigjson, caselist) {
 links = [];
   for(key in bigjson[testcase]){
         var temp = {}
         if(bigjson[testcase][key] == 1){
-          console.log(key)
-          temp["source"] = testcase
-          temp["target"] = key
+          temp["source"] = caselist[testcase] || testcase
+          temp["target"] = caselist[key] || key
           temp["type"] = "suit"
           if(temp["source"] != temp["target"]){       //no case cites itself!!
             links.push(temp)
           }
         } else if (bigjson[testcase][key] == 2) {
-          temp["source"] = key
-          temp["target"] = testcase
+          temp["source"] = caselist[key] || key
+          temp["target"] = caselist[testcase] || testcase
           temp["type"] = "licensing"
           if(temp["source"] != temp["target"]){
             links.push(temp)
