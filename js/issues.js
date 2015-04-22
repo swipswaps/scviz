@@ -1,4 +1,9 @@
 // Graph a justice's votes by issue
+// next step: do mouseovers on more than 1 graph
+
+//var justices;
+$("#get-name").val("TMarshall");
+$("#get-name2").val("AScalia");
 
 $('.dropdown-toggle').dropdown();
 $('#dropdownList li').on('click', function() {
@@ -105,7 +110,7 @@ d3.csv("data/justice-centered/SCDB_2014_01_justiceCentered_Vote.csv", function(e
   });
 
   color.domain(current_justices);
-  justices = color.domain().map(function(name) {
+  var justices = color.domain().map(function(name) {
      return {
        name: name,
        values: data.map(function(d) {
@@ -199,8 +204,8 @@ function updateData() {
     current_justices = [targetJustice, targetJustice2];
     targetissue = issueKeys[$("#dropdownMenu1").text()];
     data = [];
-    justices = null;
-    // Get the data again
+    //justices = null;
+    // Load the new data
     d3.csv("data/justice-centered/SCDB_2014_01_justiceCentered_Vote.csv", function(error, csv_data) {
         csv_data.forEach(function(d) {
             if (d.justiceName !== targetJustice && d.justiceName !== targetJustice2) return 1;
@@ -254,34 +259,61 @@ function updateData() {
           ]);
 
       // Select the section we want to apply our changes to
-      var svg = d3.select("body").transition();
+      var svgtrans = d3.select("body").transition();
+      var svg = d3.select("svg").select("g");
 
       // Make the changes
-        svg.select(".line")   // change the line
-            .duration(750)
-            .attr("d", line(data));
-        svg.select(".x.axis") // change the x axis
+        svgtrans.select(".x.axis") // change the x axis
             .duration(750)
             .call(xAxis);
-        svg.select(".y.axis") // change the y axis
+        svgtrans.select(".y.axis") // change the y axis
             .duration(750)
             .call(yAxis);
 
-        var justice = svg.selectAll(".justice")
-            .data(justices)
-            .enter().append("g")
-            .attr("class", "justice");
+        /*
+        svgtrans.selectAll(".line")   // change the line
+            .duration(500)
+            .style("stroke", "white");
+        svgtrans.selectAll(".justice")
+            .duration(500)
+            .remove()
+            .transition().call(function(){console.log("done")});
+            */
+      svg.selectAll(".justice")
+          .remove();
+      svg.select("rect")
+          .on("mousemove", mousemove);
+      
+      justice = svg.selectAll(".justice")
+          .data(justices)
+          .enter().append("g")
+          .attr("class", "justice");
 
-        justice.append("path")
-            .attr("class", "line")
-            .attr("d", function(d) { return line(d.values); })
-            .style("stroke", function(d) { return color(d.name); });
+      justice.append("path")
+          .attr("class", "line")
+          .attr("d", function(d) { return line(d.values); })
+          .style("stroke", function(d) { return color(d.name); });
 
-        justice.append("text")
-            .datum(function(d) { return {name: d.name, value: d.values[d.values.length - 1]}; })
-            .attr("transform", function(d) { return "translate(" + x(d.value.date) + "," + y(d.value.vote) + ")"; })
-            .attr("x", 3)
-            .attr("dy", ".35em")
-            .text(function(d) { return d.name; });
+      justice.append("text")
+          .datum(function(d) { return {name: d.name, value: d.values[d.values.length - 1]}; })
+          .attr("transform", function(d) { return "translate(" + x(d.value.date) + "," + y(d.value.vote) + ")"; })
+          .attr("x", 3)
+          .attr("dy", ".35em")
+          .text(function(d) { return d.name; });
+
+      //try to just update the mousemove function in focus?
+      function mousemove() {
+        var focus = d3.select(".focus");
+        var x0 = x.invert(d3.mouse(this)[0]);
+          for (var j = 0; j < justices.length; j++) {
+                var i = bisectDate(justices[j].values, x0, 1),
+                d0 = justices[j].values[i - 1],
+                d1 = justices[j].values[i];
+            if (d0 == null || d1 == null || d0.vote == null || d1.vote == null) continue;
+                var d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+            focus.attr("transform", "translate(" + x(d.date) + "," + y(d.vote) + ")");
+            focus.select("text").text(formatHoverText(d, justices[j].name));
+          }
+      }
     });
 }
