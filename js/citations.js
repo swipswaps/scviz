@@ -1,46 +1,32 @@
 var nodes = {};
 var lookingfor;
-testcase = "350 U.S. 568" // replace with user input
+testcase = "315 U.S. 740" // replace with user input
 
 queue()
-    .defer(d3.json, "data/citations/1956.json")
+    .defer(d3.json, "data/citations/adjlist.json")
     .await(ready);
 
-function ready(error, year) {
+function ready(error, bigjson) {
 links = [];
-// get all cases that a given case, testcase, cites
-  for(key in year[testcase]){
-    if(year[testcase][key] != 1){
-      continue;
-    } else {
+  for(key in bigjson[testcase]){
         var temp = {}
-        temp["source"] = testcase
-        temp["target"] = year["Unnamed: 0"][key]
-        temp["type"] = "suit"
-        if(temp["source"] != temp["target"]){       //no case cites itself!!
-          links.push(temp)
-        } else {
-          continue;
+        if(bigjson[testcase][key] == 1){
+          console.log(key)
+          temp["source"] = testcase
+          temp["target"] = key
+          temp["type"] = "suit"
+          if(temp["source"] != temp["target"]){       //no case cites itself!!
+            links.push(temp)
+          }
+        } else if (bigjson[testcase][key] == 2) {
+          temp["source"] = key
+          temp["target"] = testcase
+          temp["type"] = "licensing"
+          if(temp["source"] != temp["target"]){
+            links.push(temp)
+          }
         }
-      }
     }
-
-// get all cases that cite a given case, testcase
-  for(thiscase in year){
-    for(cited in year[thiscase]) {
-      if(year[thiscase][cited] == 1 && year["Unnamed: 0"][cited] == testcase){
-        var temp = {}
-        temp["source"] = year["Unnamed: 0"][cited]
-        temp["target"] = testcase
-        temp["type"] = "licensing"
-        if(temp["source"] != temp["target"]){       //no case cites itself!!
-          links.push(temp)
-        } else {
-          continue;
-        }
-      }
-    }
-  }
 
   links.forEach(function(link) {
     link.source = nodes[link.source] || (nodes[link.source] = {name: link.source});
