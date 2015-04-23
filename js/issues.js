@@ -1,8 +1,8 @@
 // Graph a justice's votes by issue
 // next step: do mouseovers on more than 1 graph
 
-//var justices;
-$("#get-name").val("TMarshall");
+var justices;
+$("#get-name").val("JGRoberts");
 $("#get-name2").val("AScalia");
 
 $('.dropdown-toggle').dropdown();
@@ -11,7 +11,9 @@ $('#dropdownList li').on('click', function() {
     });
 
 var justice_names = 
-['AFortas', 'AJGoldberg', 'AMKennedy', 'AScalia', 'BRWhite', 'CEWhittaker', 'CThomas', 'DHSouter', 'EKagan', 'EWarren', 'FFrankfurter', 'FMurphy', 'FMVinson', 'HABlackmun', 'HHBurton', 'HLBlack', 'JGRoberts', 'JHarlan2', 'JPStevens', 'LFPowell', 'PStewart', 'RBGinsburg', 'RHJackson', 'SAAlito', 'SDOConnor', 'SFReed', 'SGBreyer', 'SMinton', 'SSotomayor', 'TCClark', 'TMarshall', 'WBRutledge', 'WEBurger', 'WHRehnquist', 'WJBrennan', 'WODouglas'];
+['JGRoberts', 'AScalia'];
+/*['AFortas', 'AJGoldberg', 'AMKennedy', 'AScalia', 'BRWhite', 'CEWhittaker', 'CThomas', 'DHSouter', 'EKagan', 'EWarren', 'FFrankfurter', 'FMurphy', 'FMVinson', 'HABlackmun', 'HHBurton', 'HLBlack', 'JGRoberts', 'JHarlan2', 'JPStevens', 'LFPowell', 'PStewart', 'RBGinsburg', 'RHJackson', 'SAAlito', 'SDOConnor', 'SFReed', 'SGBreyer', 'SMinton', 'SSotomayor', 'TCClark', 'TMarshall', 'WBRutledge', 'WEBurger', 'WHRehnquist', 'WJBrennan', 'WODouglas'];
+ */
 var current_justices = justice_names;
 
 var issueKeys = {
@@ -83,50 +85,42 @@ var svg = d3.select("body").append("svg")
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+
 d3.csv("data/justice-centered/SCDB_2014_01_justiceCentered_Vote.csv", function(error, csv_data) {
+  justices = [];
+  for (var i = 0; i < justice_names.length; i++) {
+    justices[i] = new Object();
+    justices[i].name = justice_names[i];
+    justices[i].values = [];
+  }
   csv_data.forEach(function(d) {
+    if (d.justiceName !== current_justices[0] && d.justiceName !== current_justices[1]) return 1;
     d.date = parseDate(d.term);
     d.vote = +d.vote;
+    var data = d.justiceName == justices[0].name ? justices[0].values : justices[1].values;
     if (data.length == 0 || data[data.length-1].date.getTime() != d.date.getTime()) {
       var sccase = new Object();
-      sccase.date = d.date;
-      sccase[d.justiceName] = [];
+      sccase.date = d.date, sccase.vote = 0, sccase.totalvotes = 1;
       if (d.vote == 1 || d.vote == 3 || d.vote == 4) //only count consents
-        sccase[d.justiceName].vote = 1;
-      else sccase[d.justiceName].vote = 0;
-      sccase[d.justiceName].totalvotes = 1;
-      data.push(sccase);
+        sccase.vote += 1;
+      data[data.length] = sccase;
     }
     else {
-      if (data[data.length-1][d.justiceName] == null) {
-        data[data.length-1][d.justiceName] = [];
-        data[data.length-1][d.justiceName].vote = 0;
-        data[data.length-1][d.justiceName].totalvotes = 0;
-      }
+      data[data.length-1].totalvotes += 1;
       if (d.vote == 1 || d.vote == 3 || d.vote == 4) //only count consents
-        data[data.length-1][d.justiceName].vote += 1;
-      data[data.length-1][d.justiceName].totalvotes += 1;
+        data[data.length-1].vote += 1;
     }
-  });
-
-  color.domain(current_justices);
-  var justices = color.domain().map(function(name) {
-     return {
-       name: name,
-       values: data.map(function(d) {
-          if (d[name] != null)
-           return {date: d.date, vote: +d[name].vote, totalvotes: +d[name].totalvotes};
-          else
-           return {date: d.date, vote: null, totalvotes: null};
-       })
-     };
   });
 
   data.sort(function(a, b) {
     return a.date - b.date;
   });
 
-  x.domain([data[0].date, data[data.length - 1].date]);
+  color.domain(current_justices);
+  x.domain([
+    d3.min(justices, function(c) { return d3.min(c.values, function(v) { if (v != null)return v.date; else return 9999 }); }),
+    d3.max(justices, function(c) { return d3.max(c.values, function(v) { if (v != null) return v.date; else return 0; }); })
+  ]);
   y.domain([
     d3.min(justices, function(c) { return d3.min(c.values, function(v) { if (v != null)return v.vote; else return 999 }); }),
     d3.max(justices, function(c) { return d3.max(c.values, function(v) { if (v != null) return v.vote; else return 0; }); })
@@ -168,13 +162,6 @@ d3.csv("data/justice-centered/SCDB_2014_01_justiceCentered_Vote.csv", function(e
       .attr("class", "focus")
       .style("display", "none");
 
-  focus.append("circle")
-      .attr("r", 4.5);
-
-  focus.append("text")
-      .attr("x", 9)
-      .attr("dy", ".35em");
-
   svg.append("rect")
       .attr("class", "overlay")
       .attr("width", width)
@@ -186,11 +173,13 @@ d3.csv("data/justice-centered/SCDB_2014_01_justiceCentered_Vote.csv", function(e
   function mousemove() {
     var x0 = x.invert(d3.mouse(this)[0]);
       for (var j = 0; j < justices.length; j++) {
-            var i = bisectDate(justices[j].values, x0, 1),
-            d0 = justices[j].values[i - 1],
-            d1 = justices[j].values[i];
+        var i = bisectDate(justices[j].values, x0, 1),
+        d0 = justices[j].values[i - 1],
+        d1 = justices[j].values[i];
         if (d0 == null || d1 == null || d0.vote == null || d1.vote == null) continue;
-            var d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+        var d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+        focus.append("circle").attr("r", 4.5);
+        focus.append("text").attr("x", 9).attr("dy", ".35em");
         focus.attr("transform", "translate(" + x(d.date) + "," + y(d.vote) + ")");
         focus.select("text").text(formatHoverText(d, justices[j].name));
       }
@@ -203,56 +192,40 @@ function updateData() {
     targetJustice2 = $("#get-name2").val();
     current_justices = [targetJustice, targetJustice2];
     targetissue = issueKeys[$("#dropdownMenu1").text()];
-    data = [];
-    //justices = null;
     // Load the new data
     d3.csv("data/justice-centered/SCDB_2014_01_justiceCentered_Vote.csv", function(error, csv_data) {
-        csv_data.forEach(function(d) {
-            if (d.justiceName !== targetJustice && d.justiceName !== targetJustice2) return 1;
-            if (targetissue != null && targetissue != +d.issueArea) return 1;
+          justices = [];
+          for (var i = 0; i < justice_names.length; i++) {
+            justices[i] = new Object();
+            justices[i].name = justice_names[i];
+            justices[i].values = [];
+          }
+          color.domain(justices);
+          csv_data.forEach(function(d) {
+            if (d.justiceName !== current_justices[0] && d.justiceName !== current_justices[1]) return 1;
+            if (targetissue != null && +d.issueArea != targetissue) return 1;
             d.date = parseDate(d.term);
             d.vote = +d.vote;
+            var data = d.justiceName == justices[0].name ? justices[0].values : justices[1].values;
             if (data.length == 0 || data[data.length-1].date.getTime() != d.date.getTime()) {
               var sccase = new Object();
-              sccase.date = d.date;
-              sccase[d.justiceName] = [];
+              sccase.date = d.date, sccase.vote = 0, sccase.totalvotes = 1;
               if (d.vote == 1 || d.vote == 3 || d.vote == 4) //only count consents
-                sccase[d.justiceName].vote = 1;
-              else sccase[d.justiceName].vote = 0;
-              sccase[d.justiceName].totalvotes = 1;
-              data.push(sccase);
+                sccase.vote += 1;
+              data[data.length] = sccase;
             }
             else {
-              if (data[data.length-1][d.justiceName] == null) {
-                data[data.length-1][d.justiceName] = [];
-                data[data.length-1][d.justiceName].vote = 0;
-                data[data.length-1][d.justiceName].totalvotes = 0;
-              }
+              data[data.length-1].totalvotes += 1;
               if (d.vote == 1 || d.vote == 3 || d.vote == 4) //only count consents
-                data[data.length-1][d.justiceName].vote += 1;
-              data[data.length-1][d.justiceName].totalvotes += 1;
+                data[data.length-1].vote += 1;
             }
           });
-
-          color.domain(current_justices);
-          justices = color.domain().map(function(name) {
-             return {
-               name: name,
-               values: data.map(function(d) {
-                  if (d[name] != null)
-                   return {date: d.date, vote: +d[name].vote, totalvotes: +d[name].totalvotes};
-                  else
-                   return {date: d.date, vote: null, totalvotes: null};
-               })
-             };
-          });
-
-          data.sort(function(a, b) {
-            return a.date - b.date;
-          });
-
+             
           // Scale the range of the data again 
-          x.domain([data[0].date, data[data.length - 1].date]);
+          x.domain([
+            d3.min(justices, function(c) { return d3.min(c.values, function(v) { if (v != null)return v.date; else return 9999 }); }),
+            d3.max(justices, function(c) { return d3.max(c.values, function(v) { if (v != null) return v.date; else return 0; }); })
+          ]);
           y.domain([
             d3.min(justices, function(c) { return d3.min(c.values, function(v) { if (v != null)return v.vote; else return 999 }); }),
             d3.max(justices, function(c) { return d3.max(c.values, function(v) { if (v != null) return v.vote; else return 0; }); })
@@ -269,9 +242,8 @@ function updateData() {
         svgtrans.select(".y.axis") // change the y axis
             .duration(750)
             .call(yAxis);
-
         /*
-        svgtrans.selectAll(".line")   // change the line
+        svgtrans.selectAll(".line")   // change the line using transitions
             .duration(500)
             .style("stroke", "white");
         svgtrans.selectAll(".justice")
@@ -306,11 +278,13 @@ function updateData() {
         var focus = d3.select(".focus");
         var x0 = x.invert(d3.mouse(this)[0]);
           for (var j = 0; j < justices.length; j++) {
-                var i = bisectDate(justices[j].values, x0, 1),
-                d0 = justices[j].values[i - 1],
-                d1 = justices[j].values[i];
+            var i = bisectDate(justices[j].values, x0, 1),
+            d0 = justices[j].values[i - 1],
+            d1 = justices[j].values[i];
             if (d0 == null || d1 == null || d0.vote == null || d1.vote == null) continue;
-                var d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+            var d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+            focus.append("circle").attr("r", 4.5);
+            focus.append("text").attr("x", 9).attr("dy", ".35em");
             focus.attr("transform", "translate(" + x(d.date) + "," + y(d.vote) + ")");
             focus.select("text").text(formatHoverText(d, justices[j].name));
           }
