@@ -45,7 +45,7 @@ links = [];
       .on("tick", tick)
       .start();
 
-  var svg = d3.select("body").append("svg")
+  var svg = d3.select("#canvass").append("svg")
       .attr("width", width)
       .attr("height", height);
 
@@ -76,11 +76,18 @@ var regg = /\d+/gi;
       .attr("r", 6)
       .call(force.drag)
             .on("click", function(d) { 
+              //FOLLOWING CODE OPENS THE CASE IN A NEW TAB:
         var mystr = d.name;
-        var numlist = mystr.match(regg);
-        console.log(numlist)
+        /*var numlist = mystr.match(regg);
+        // console.log(numlist)
         var url = base + numlist[0] + "&invol=" + numlist[1];
-        window.open(url); });
+        window.open(url);*/
+        bigregg = /\d{1,3}\s{1,3}U.S.(\s|,\sat\s)\d{1,3}/gi; //same as from python code
+        testcase = mystr.match(bigregg)[0]  //find the key for use in mastercaselist.json
+        d3.select("svg").remove();  //remove the last graph viz
+        ready(error,bigjson,caselist)   //call ready again to create the new one
+
+         });
 
   var text = svg.append("g").selectAll("text")
       .data(force.nodes())
@@ -89,6 +96,13 @@ var regg = /\d+/gi;
       .attr("y", ".31em")
       .text(function(d) { 
         return d.name
+      })
+      .on("click", function(d){
+        var mystr = d.name;
+        var numlist = mystr.match(regg);
+        // console.log(numlist)
+        var url = base + numlist[0] + "&invol=" + numlist[1];
+        window.open(url);
       });
 
 
