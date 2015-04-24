@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>jQuery UI Autocomplete - Combobox</title>
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+  <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+  <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+  <style>
+  .custom-combobox {
+    position: relative;
+    display: inline-block;
+  }
+  .custom-combobox-toggle {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    margin-left: -1px;
+    padding: 0;
+  }
+  .custom-combobox-input {
+    margin: 0;
+    padding: 5px 10px;
+  }
+  </style>
+  <script>
+    function init() {
+      for (var i = 0; i < 4; i++) {
+        $('#combobox2').append('<option value="'+i+'">'+i+'</option>');
+      }
+    }
+    x("combobox");
+    x("combobox2");
+  </script>
+  <script src="autocomplete.js"></script>
+</head>
+<body onload="init()">
+ 
+<div class="ui-widget">
+  <label>Your preferred programming language: </label>
+  <select id="combobox">
+    <option value="">Select one...</option>
+    <option value="ActionScript">ActionScript</option>
+    <option value="AppleScript">AppleScript</option>
+    <option value="Asp">Asp</option>
+    <option value="BASIC">BASIC</option>
+    <option value="C">C</option>
+    <option value="C++">C++</option>
+    <option value="Clojure">Clojure</option>
+    <option value="COBOL">COBOL</option>
+    <option value="ColdFusion">ColdFusion</option>
+    <option value="Erlang">Erlang</option>
+    <option value="Fortran">Fortran</option>
+    <option value="Groovy">Groovy</option>
+    <option value="Haskell">Haskell</option>
+    <option value="Java">Java</option>
+    <option value="JavaScript">JavaScript</option>
+    <option value="Lisp">Lisp</option>
+    <option value="Perl">Perl</option>
+    <option value="PHP">PHP</option>
+    <option value="Python">Python</option>
+    <option value="Ruby">Ruby</option>
+    <option value="Scala">Scala</option>
+    <option value="Scheme">Scheme</option>
+  </select>
+</div>
+<div class="ui-widget">
+  <label>Your 2nd preferred programming language: </label>
+  <select id="combobox2">
+    <option value="">Select one...</option>
+    <option value="ActionScript">ActionScript</option>
+    <option value="AppleScript">AppleScript</option>
+  </select>
+</div>
+ 
+</body>
+</html>
