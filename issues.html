@@ -8,14 +8,19 @@
     <meta name="author" content="">
     <title>Explore by Issue</title>
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet">
+    <link href="frontend/autocomplete.css" rel="stylesheet">
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
     <link href="frontend/style.css" rel="stylesheet">
     <link href="frontend/issues.css" rel="stylesheet">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-    <script src="js/typeahead.bundle.js"></script>
+      <script src="//code.jquery.com/jquery-1.10.2.js" ></script>
+      <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js" ></script>
+    <!--script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js" ></script-->
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js" ></script>
+    <!--script src="js/typeahead.bundle.js" ></script-->
+      <script src="js/autocomplete.js" ></script>
   </head>
 
-  <body>
+  <body onload="init()">
 
     <nav class="navbar navbar-inverse navbar-fixed-top">
       <div class="container">
@@ -33,14 +38,31 @@
       </div>
     </nav>
     <br><br>
-    <div class="container center"><h2>This page should allow people to see how <em>often</em> two justices voted the same way on a certain issue. Input: two justices, one issue. Data way too big right now.<h2>
-    <div class="container center" >
-      <input class="typeahead form-control" type="text" id="get-name" placeholder="Enter First Justice">
+    <div class="ui-widget">
+      <label>Test: </label>
+      <select id="combobox">
+        <option value="">Select one...</option>
+      </select>
     </div>
-    <div class="container center" >
-      <input class="typeahead form-control" type="text" id="get-name2" placeholder="Enter Second Justice">
+    <div class="ui-widget" >
+      <label>Select a Justice</label>
+      <select id="get-name">
+        <option value="">Select one...</option>
+      </select>
     </div>
-    <div class="container center" id="get-issue">
+    <div class="ui-widget" >
+      <label>Select a second Justice</label>
+      <select id="get-name2">
+        <option value="">Select one...</option>
+      </select>
+    </div>
+    <div class="ui-widget" >
+      <label>Select an issue to inspect(leave blank for all issues)</label>
+      <select id="get-issue">
+        <option value="">Select one...</option>
+      </select>
+    </div>
+    <!--div class="container center" id="get-issue">
       <div class="dropdown">
         <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">
 
@@ -65,30 +87,14 @@
           <li role="presentation"><a role="menuitem" tabindex="14" href="#">Private Action</a></li>
         </ul>
       </div>
-    </div>
-  <div class="col-md-4">
-    <div class="input-group">
-      <input type="text" class="form-control" placeholder="Select an Issue">
-      <div class="input-group-btn">
-        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">Select...<span class="caret"></span></button>
-        <ul class="dropdown-menu dropdown-menu-right" role="menu">
-          <li><a href="#">First Amendment</a></li>
-          <li><a href="#">Civil Rights</a></li>
-          <li><a href="#">Due Process</a></li>
-          <li class="divider"></li>
-          <li><a href="#">All</a></li>
-        </ul>
-      </div><!-- /btn-group -->
-    </div><!-- /input-group -->
-  </div><!-- /.col-lg-6 -->
-</div><!-- /.row -->
+    </div-->
     <br>
     <div class="container center" id="visualize">
       <button type="button" class="btn btn-default" onclick="updateData()">Visualize</button> 
     </div>
     <div class="container">
-      <script src="http://d3js.org/d3.v3.js"></script>
-      <script src="js/issues.js"></script>
+      <script src="http://d3js.org/d3.v3.js" ></script>
+      <script src="js/issues.js" ></script>
     </div>	
       <hr>
       <footer class="footer">

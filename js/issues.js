@@ -1,49 +1,75 @@
-// Graph a justice's votes by issue
-// next step: do mouseovers on more than 1 graph
+/* TODO
+ * try to get the dropdown menu on the autofill to be there
+ * Error check for bad input from user
+ * write a little blurb about what this does at the top
+ * transition lines?
+ * extra:
+ * add ability to look at multiple issues
+ * add ability to look at it by court (roberts court, Rehnquist court)
+    * either shows the people in the reign of the court
+        or each court is one line
+*/
+
+function init() {
+  var listjustices=['AFortas', 'AJGoldberg', 'AMKennedy', 'AScalia', 'BRWhite', 'CEWhittaker', 'CThomas', 'DHSouter', 'EKagan', 'EWarren', 'FFrankfurter', 'FMurphy', 'FMVinson', 'HABlackmun', 'HHBurton', 'HLBlack', 'JGRoberts', 'JHarlan2', 'JPStevens', 'LFPowell', 'PStewart', 'RBGinsburg', 'RHJackson', 'SAAlito', 'SDOConnor', 'SFReed', 'SGBreyer', 'SMinton', 'SSotomayor', 'TCClark', 'TMarshall', 'WBRutledge', 'WEBurger', 'WHRehnquist', 'WJBrennan', 'WODouglas'];
+  var listissues=["Criminal Procedure", "Civil Rights", "First Amendment", "Due Process", "Privacy", "Attorneys", "Unions", "Economic Activity", "Judicial Power", "Federalism", "Interstate Relations", "Federal Taxation", "Miscellaneous", "Private Action"]
+  for (var i in listjustices) {
+    $('#combobox').append('<option value="'+listjustices[i]+'">'+listjustices[i]+'</option>');
+    $('#get-name').append('<option value="'+listjustices[i]+'">'+listjustices[i]+'</option>');
+    $('#get-name2').append('<option value="'+listjustices[i]+'">'+listjustices[i]+'</option>');
+  }
+  for (var i in listissues) {
+    $('#get-issue').append('<option value="'+listissues[i]+'">'+listissues[i]+'</option>');
+  }
+}
+loadauto("combobox");
+loadauto("get-name");
+loadauto("get-name2");
+loadauto("get-issue");
 
 var justices;
-$("#get-name").val("JGRoberts");
-$("#get-name2").val("AScalia");
-
+/* 
+ *from old issue drop down
 $('.dropdown-toggle').dropdown();
 $('#dropdownList li').on('click', function() {
     $('#dropdownMenu1').html($(this).html());
-    });
+});
+*/
 
 var justice_names = 
 ['JGRoberts', 'AFortas'];
-/*['AFortas', 'AJGoldberg', 'AMKennedy', 'AScalia', 'BRWhite', 'CEWhittaker', 'CThomas', 'DHSouter', 'EKagan', 'EWarren', 'FFrankfurter', 'FMurphy', 'FMVinson', 'HABlackmun', 'HHBurton', 'HLBlack', 'JGRoberts', 'JHarlan2', 'JPStevens', 'LFPowell', 'PStewart', 'RBGinsburg', 'RHJackson', 'SAAlito', 'SDOConnor', 'SFReed', 'SGBreyer', 'SMinton', 'SSotomayor', 'TCClark', 'TMarshall', 'WBRutledge', 'WEBurger', 'WHRehnquist', 'WJBrennan', 'WODouglas'];
- */
+
 
 var issueKeys = {
-"Criminal Procedure":1,
-"Civil Rights":2,
-"First Amendment":3,
-"Due Process":4,
-"Privacy":5,
-"Attorneys":6,
-"Unions":7,
-"Economic Activity":8,
-"Judicial Power":9,
-"Federalism":10,
-"Interstate Relations":11,
-"Federal Taxation":12,
-"Miscellaneous":13,
-"Private Action":14,
-1:"Criminal Procedure",
-2:"Civil Rights",
-3:"First Amendment",
-4:"Due Process",
-5:"Privacy",
-6:"Attorneys",
-7:"Unions",
-8:"Economic Activity",
-9:"Judicial Power",
-10:"Federalism",
-11:"Interstate Relations",
-12:"Federal Taxation",
-13:"Miscellaneous",
-14:"Private Action"}
+  "Criminal Procedure":1,
+  "Civil Rights":2,
+  "First Amendment":3,
+  "Due Process":4,
+  "Privacy":5,
+  "Attorneys":6,
+  "Unions":7,
+  "Economic Activity":8,
+  "Judicial Power":9,
+  "Federalism":10,
+  "Interstate Relations":11,
+  "Federal Taxation":12,
+  "Miscellaneous":13,
+  "Private Action":14,
+  1:"Criminal Procedure",
+  2:"Civil Rights",
+  3:"First Amendment",
+  4:"Due Process",
+  5:"Privacy",
+  6:"Attorneys",
+  7:"Unions",
+  8:"Economic Activity",
+  9:"Judicial Power",
+  10:"Federalism",
+  11:"Interstate Relations",
+  12:"Federal Taxation",
+  13:"Miscellaneous",
+  14:"Private Action"
+}
 
 var data = [];
 var margin = {top: 20, right: 50, bottom: 30, left: 50},
@@ -83,7 +109,6 @@ var svg = d3.select("body").append("svg")
     .attr("height", height + margin.top + margin.bottom)
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
 
 d3.csv("data/justice-centered/SCDB_2014_01_justiceCentered_Vote.csv", function(error, csv_data) {
   justices = [];
@@ -196,13 +221,13 @@ d3.csv("data/justice-centered/SCDB_2014_01_justiceCentered_Vote.csv", function(e
       }
   }
 });
-
 // ** Update data section (Called from the onclick)
 function updateData() {
     targetJustice = $("#get-name").val();
     targetJustice2 = $("#get-name2").val();
+    targetissue = issueKeys[$("#get-issue").val()];
+    //targetissue = issueKeys[$("#dropdownMenu1").text()];
     justice_names = [targetJustice, targetJustice2];
-    targetissue = issueKeys[$("#dropdownMenu1").text()];
     // Load the new data
     d3.csv("data/justice-centered/SCDB_2014_01_justiceCentered_Vote.csv", function(error, csv_data) {
           justices = [];
