@@ -2,7 +2,7 @@
   call x and pass it the id of the selection box you want
   autocomplete.html is a reference of how to set it up
 */
-function x(selectID) {
+function loadauto(selectID) {
   $.widget( "custom."+selectID, {
       _create: function() {
         this.wrapper = $( "<span>" )
@@ -45,9 +45,9 @@ function x(selectID) {
       },
  
       _createShowAllButton: function() {
+console.log("adding button"); 
         var input = this.input,
           wasOpen = false;
- 
         $( "<a>" )
           .attr( "tabIndex", -1 )
           .attr( "title", "Show All Items" )
