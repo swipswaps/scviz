@@ -3,9 +3,9 @@ var width = 960,
 
 var rateById = d3.map();
 
-var issue = "All"
+var issue = "Criminal Procedure"
 var issueKeys = {
-"Criminal Procedure":1,
+"Criminal Procedure":1, //florida has hella of this one!!!
 "Civil Rights":2,
 "First Amendment":3,
 "Due Process":4,
