@@ -45,7 +45,6 @@ function loadauto(selectID) {
       },
  
       _createShowAllButton: function() {
-console.log("adding button"); 
         var input = this.input,
           wasOpen = false;
         $( "<a>" )
