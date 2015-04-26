@@ -3,7 +3,8 @@ var width = 960,
 
 var rateById = d3.map();
 
-var issue = "Criminal Procedure"
+var issue = "All"
+
 var issueKeys = {
 "Criminal Procedure":1, //florida has hella of this one!!!
 "Civil Rights":2,
