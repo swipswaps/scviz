@@ -1,0 +1,32 @@
+.stateColors {
+  fill: #D1D1E0;
+  stroke: #000;
+}
+
+.stateBounds {
+  fill: #000;
+  stroke: #000;
+  stroke-linejoin: round;
+}
+
+#title {
+    font-family:Helvetica,Sans-Serif;
+    font-size: 26px;
+    text-align: center;
+    font-style: bold;
+}
+
+#info {
+  position:right;
+  font-family:Helvetica,Sans-Serif;
+}
+
+.q0-9 { fill:#B2E0B2; }
+.q1-9 { fill:#80CC80; }
+.q2-9 { fill:#4DB84D; }
+.q3-9 { fill:#19A319; }
+.q4-9 { fill:#008A00; }
+.q5-9 { fill:#006B00; }
+.q6-9 { fill:#004C00; }
+.q7-9 { fill:#002E00; }
+.q8-9 { fill:#000F00; }

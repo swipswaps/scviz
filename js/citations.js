@@ -1,13 +1,14 @@
 var nodes = {};
 var lookingfor;
-testcase = "350 U.S. 818" // replace with user input
+testcase = "531 U.S. 98" // replace with user input!!!!!!!!!
 
 queue()
     .defer(d3.json, "data/citations/adjlist.json") //next, get the master list!
     .defer(d3.json, "data/citations/mastercaselist.json")
+    .defer(d3.json, "data/citations/oldstyletodocket.json")
     .await(ready);
 
-function ready(error, bigjson, caselist) {
+function ready(error, bigjson, caselist, dockets) {
 links = [];
   for(key in bigjson[testcase]){
         var temp = {}
@@ -76,17 +77,12 @@ var regg = /\d+/gi;
       .attr("r", 6)
       .call(force.drag)
             .on("click", function(d) { 
-              //FOLLOWING CODE OPENS THE CASE IN A NEW TAB:
+              // REDRAW GRAPH ON CLICK OF A CIRCLE
         var mystr = d.name;
-        /*var numlist = mystr.match(regg);
-        // console.log(numlist)
-        var url = base + numlist[0] + "&invol=" + numlist[1];
-        window.open(url);*/
         bigregg = /\d{1,3}\s{1,3}U.S.(\s|,\sat\s)\d{1,3}/gi; //same as from python code
-        testcase = mystr.match(bigregg)[0]  //find the key for use in mastercaselist.json
-        d3.select("svg").remove();  //remove the last graph viz
-        ready(error,bigjson,caselist)   //call ready again to create the new one
-
+        testcase = mystr.match(bigregg)[0]  //find the key for use in mastercaselist.json ERRORS HERE
+        d3.select("svg").remove();          //remove the last graph viz
+        ready(error,bigjson,caselist)       //call ready again to create the new one
          });
 
   var text = svg.append("g").selectAll("text")
@@ -97,11 +93,23 @@ var regg = /\d+/gi;
       .text(function(d) { 
         return d.name
       })
-      .on("click", function(d){
+      .on("click", function(d){ //open link in new window -- need to fix this for cases after 1997!
         var mystr = d.name;
         var numlist = mystr.match(regg);
-        // console.log(numlist)
-        var url = base + numlist[0] + "&invol=" + numlist[1];
+        if(! numlist){
+          console.log("hi")
+          try {
+            // x = caselist.getKeyByValue(d.name)
+            // y = dockets[x]
+            // url = base + "000&invol=" + y
+          }
+          catch(e) {
+            url = "http://findlaw.com"
+          }
+        } 
+        else {
+          url = base + numlist[0] + "&invol=" + numlist[1];
+        }
         window.open(url);
       });
 
@@ -124,3 +132,12 @@ var regg = /\d+/gi;
     return "translate(" + d.x + "," + d.y + ")";
   }
 }
+
+// Object.prototype.getKeyByValue = function( value ) {
+//     for( var prop in this ) {
+//         if( this.hasOwnProperty( prop ) ) {
+//              if( this[ prop ] === value )
+//                  return prop;
+//         }
+//     }
+// }
