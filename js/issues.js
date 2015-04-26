@@ -24,10 +24,10 @@ function init() {
     $('#get-issue').append('<option value="'+listissues[i]+'">'+listissues[i]+'</option>');
   }
 }
-loadauto("combobox");
-loadauto("get-name");
-loadauto("get-name2");
-loadauto("get-issue");
+  $("#get-name").combobox();
+  $("#get-name2").combobox();
+  $("#get-issue").combobox();
+
 
 var justices;
 /* 
