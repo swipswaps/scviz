@@ -1,14 +1,24 @@
 var nodes = {};
-var lookingfor;
-testcase = "531 U.S. 98" // replace with user input!!!!!!!!!
+function init() {
+  $.get("data/citations/nametooldcite.json", function (data) {
+      namelist = Object.keys(data)
+      for (var i in namelist) {
+        $('#get-case').append('<option value="'+namelist[i]+'">'+namelist[i]+'</option>');
+      }
+  });
+}
+// loadauto("get-case");
+targetCase = $("#get-case").val();
 
 queue()
     .defer(d3.json, "data/citations/adjlist.json") //next, get the master list!
     .defer(d3.json, "data/citations/mastercaselist.json")
     .defer(d3.json, "data/citations/oldstyletodocket.json")
+    .defer(d3.json, "data/citations/nametooldcite.json")
     .await(ready);
 
-function ready(error, bigjson, caselist, dockets) {
+function ready(error, bigjson, caselist, dockets, namestocites) {
+
 links = [];
   for(key in bigjson[testcase]){
         var temp = {}
@@ -80,9 +90,9 @@ var regg = /\d+/gi;
               // REDRAW GRAPH ON CLICK OF A CIRCLE
         var mystr = d.name;
         bigregg = /\d{1,3}\s{1,3}U.S.(\s|,\sat\s)\d{1,3}/gi; //same as from python code
-        testcase = mystr.match(bigregg)[0]  //find the key for use in mastercaselist.json ERRORS HERE
+        targetCase = mystr.match(bigregg)[0]  //find the key for use in mastercaselist.json ERRORS HERE
         d3.select("svg").remove();          //remove the last graph viz
-        ready(error,bigjson,caselist)       //call ready again to create the new one
+        ready(error,bigjson,caselist,dockets,namestocites)       //call ready again to create the new one
          });
 
   var text = svg.append("g").selectAll("text")
@@ -132,12 +142,3 @@ var regg = /\d+/gi;
     return "translate(" + d.x + "," + d.y + ")";
   }
 }
-
-// Object.prototype.getKeyByValue = function( value ) {
-//     for( var prop in this ) {
-//         if( this.hasOwnProperty( prop ) ) {
-//              if( this[ prop ] === value )
-//                  return prop;
-//         }
-//     }
-// }

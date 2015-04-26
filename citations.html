@@ -8,14 +8,17 @@
     <meta name="author" content="">
     <title>Explore Citation Network</title>
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet">
+    <link href="frontend/autocomplete.css" rel="stylesheet">
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
     <link href="frontend/citations.css" rel="stylesheet">
     <link href="frontend/style.css" rel="stylesheet">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script src="//code.jquery.com/jquery-1.10.2.min.js" ></script>
+    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.min.js" ></script>
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-    <script src="js/typeahead.bundle.js"></script>
+    <script src="js/autocomplete.js" ></script>
   </head>
 
-  <body>
+  <body onload="init()">
 
     <nav class="navbar navbar-inverse navbar-fixed-top">
       <div class="container">
@@ -33,11 +36,14 @@
       </div>
     </nav>
     <br><br>
-    <div class="col-md-4">
-      <div class="input-group">
-          <input class="typeahead form-control" type="text" placeholder="Enter Case Name">
-        </div>
-    </div>
+    <!-- <div class="col-md-4"> -->
+      <div class="ui-widget" >
+      <label>Select a Case</label>
+       <select id="get-case">
+         <option value="">Select one...</option>
+        </select>
+      </div>
+    <!-- </div> -->
     <div class="container">
           <p>Outgoing (black) arrows represent cases that the given (center) case cites, and incoming (green) arrows represent cases that cite the given case. Click on the circles to redraw the graph based on another case.</p>
     </div>
