@@ -1,17 +1,19 @@
 /* TODO
+ * change to percentages
  * try to get the dropdown menu on the autofill to be there
  * Error check for bad input from user
  * write a little blurb about what this does at the top
  * transition lines?
+ * check how much faster it is to use the parsed files by judge
  * extra:
  * add ability to look at multiple issues
  * add ability to look at it by court (roberts court, Rehnquist court)
     * either shows the people in the reign of the court
         or each court is one line
 */
+var listjustices=['AFortas', 'AJGoldberg', 'AMKennedy', 'AScalia', 'BRWhite', 'CEWhittaker', 'CThomas', 'DHSouter', 'EKagan', 'EWarren', 'FFrankfurter', 'FMurphy', 'FMVinson', 'HABlackmun', 'HHBurton', 'HLBlack', 'JGRoberts', 'JHarlan2', 'JPStevens', 'LFPowell', 'PStewart', 'RBGinsburg', 'RHJackson', 'SAAlito', 'SDOConnor', 'SFReed', 'SGBreyer', 'SMinton', 'SSotomayor', 'TCClark', 'TMarshall', 'WBRutledge', 'WEBurger', 'WHRehnquist', 'WJBrennan', 'WODouglas'];
 
 function init() {
-  var listjustices=['AFortas', 'AJGoldberg', 'AMKennedy', 'AScalia', 'BRWhite', 'CEWhittaker', 'CThomas', 'DHSouter', 'EKagan', 'EWarren', 'FFrankfurter', 'FMurphy', 'FMVinson', 'HABlackmun', 'HHBurton', 'HLBlack', 'JGRoberts', 'JHarlan2', 'JPStevens', 'LFPowell', 'PStewart', 'RBGinsburg', 'RHJackson', 'SAAlito', 'SDOConnor', 'SFReed', 'SGBreyer', 'SMinton', 'SSotomayor', 'TCClark', 'TMarshall', 'WBRutledge', 'WEBurger', 'WHRehnquist', 'WJBrennan', 'WODouglas'];
   var listissues=["Criminal Procedure", "Civil Rights", "First Amendment", "Due Process", "Privacy", "Attorneys", "Unions", "Economic Activity", "Judicial Power", "Federalism", "Interstate Relations", "Federal Taxation", "Miscellaneous", "Private Action"]
   for (var i in listjustices) {
     $('#combobox').append('<option value="'+listjustices[i]+'">'+listjustices[i]+'</option>');
@@ -100,9 +102,9 @@ var yAxis = d3.svg.axis()
     .orient("left");
 
 var line = d3.svg.line()
-    .defined(function(d){return d.vote != null})
+    .defined(function(d){return d.percent != null})
     .x(function(d) { return x(d.date); })
-    .y(function(d) { return y(d.vote); });
+    .y(function(d) { return y(d.percent); });
 
 var svg = d3.select("body").append("svg")
     .attr("width", width + margin.left + margin.right)
@@ -124,17 +126,32 @@ d3.csv("data/justice-centered/SCDB_2014_01_justiceCentered_Vote.csv", function(e
     var data = d.justiceName == justices[0].name ? justices[0].values : justices[1].values;
     if (data.length == 0 || data[data.length-1].date.getTime() != d.date.getTime()) {
       var sccase = new Object();
-      sccase.date = d.date, sccase.vote = 0, sccase.totalvotes = 1;
+      sccase.date = d.date, sccase.vote = 0, sccase.totalvotes = 1, sccase.split = 0, sccase.splittotals = 0;
       if (d.vote == 1 || d.vote == 3 || d.vote == 4) //only count consents
         sccase.vote += 1;
+      if (d.majVotes == 5 && d.minVotes == 4) {
+        if (d.vote == 1 || d.vote == 3 || d.vote == 4) //only count consents
+          sccase.split += 1;
+        sccase.splittotals += 1;
+      }
       data[data.length] = sccase;
     }
     else {
-      data[data.length-1].totalvotes += 1;
+      var sccase = data[data.length-1];
+      sccase.totalvotes += 1;
       if (d.vote == 1 || d.vote == 3 || d.vote == 4) //only count consents
-        data[data.length-1].vote += 1;
+        sccase.vote += 1;
+      if (d.majVotes == 5 && d.minVotes == 4) {
+        if (d.vote == 1 || d.vote == 3 || d.vote == 4) //only count consents
+          sccase.split += 1;
+        sccase.splittotals += 1;
+      }
     }
   });
+  justices.map(function (j){j.values.map(function (d){
+    d.percent=100*d.vote/d.totalvotes;
+    d.splitpercent = 100*d.split/d.splittotals;
+  })});
 
   data.sort(function(a, b) {
     return a.date - b.date;
@@ -145,10 +162,7 @@ d3.csv("data/justice-centered/SCDB_2014_01_justiceCentered_Vote.csv", function(e
     d3.min(justices, function(c) { return d3.min(c.values, function(v) { if (v != null)return v.date; else return 9999 }); }),
     d3.max(justices, function(c) { return d3.max(c.values, function(v) { if (v != null) return v.date; else return 0; }); })
   ]);
-  y.domain([
-    d3.min(justices, function(c) { return d3.min(c.values, function(v) { if (v != null)return v.vote; else return 999 }); }),
-    d3.max(justices, function(c) { return d3.max(c.values, function(v) { if (v != null) return v.vote; else return 0; }); })
-  ]);
+  y.domain([0, 100]);
 
   svg.append("g")
       .attr("class", "x axis")
@@ -177,7 +191,7 @@ d3.csv("data/justice-centered/SCDB_2014_01_justiceCentered_Vote.csv", function(e
 
   justice.append("text")
       .datum(function(d) { return {name: d.name, value: d.values[d.values.length - 1]}; })
-      .attr("transform", function(d) { return "translate(" + x(d.value.date) + "," + y(d.value.vote) + ")"; })
+      .attr("transform", function(d) { return "translate(" + x(d.value.date) + "," + y(d.value.percent) + ")"; })
       .attr("x", 3)
       .attr("dy", ".35em")
       .text(function(d) { return d.name; });
@@ -208,14 +222,14 @@ d3.csv("data/justice-centered/SCDB_2014_01_justiceCentered_Vote.csv", function(e
             var i = bisectDate(justices[j].values, x0, 1),
             d0 = justices[j].values[i - 1],
             d1 = justices[j].values[i];
-            if (d0 == null || d1 == null || d0.vote == null || d1.vote == null 
+            if (d0 == null || d1 == null || d0.percent == null || d1.percent == null 
                     || x0 < justices[j].values[0].date) { 
                 svg.select('#'+justices[j].name).style("display", "none");
                 continue;
             }
             var d = x0 - d0.date > d1.date - x0 ? d1 : d0;
             var myfocus = svg.select('#'+justices[j].name);
-            myfocus.attr("transform", "translate(" + x(d.date) + "," + y(d.vote) + ")");
+            myfocus.attr("transform", "translate(" + x(d.date) + "," + y(d.percent) + ")");
             myfocus.select("text").text(formatHoverText(d, justices[j].name));
         }
       }
@@ -224,8 +238,11 @@ d3.csv("data/justice-centered/SCDB_2014_01_justiceCentered_Vote.csv", function(e
 // ** Update data section (Called from the onclick)
 function updateData() {
     targetJustice = $("#get-name").val();
+    var tJexists = $.inArray(targetJustice, listjustices) > -1;
     targetJustice2 = $("#get-name2").val();
+    var tJexists2 = $.inArray(targetJustice2, listjustices) > -1;
     targetissue = issueKeys[$("#get-issue").val()];
+    var onlysplitdata = $("#splitdata").prop('checked');
     //targetissue = issueKeys[$("#dropdownMenu1").text()];
     justice_names = [targetJustice, targetJustice2];
     // Load the new data
@@ -238,34 +255,52 @@ function updateData() {
           }
           color.domain(justices);
           csv_data.forEach(function(d) {
-            if (d.justiceName !== justices[0].name && d.justiceName !== justices[1].name) return 1;
+            if (tJexists && d.justiceName !== justices[0].name &&
+                tJexists2 && d.justiceName !== justices[1].name) return 1;
             if (targetissue != null && +d.issueArea != targetissue) return 1;
             d.date = parseDate(d.term);
             d.vote = +d.vote;
             var data = d.justiceName == justices[0].name ? justices[0].values : justices[1].values;
             if (data.length == 0 || data[data.length-1].date.getTime() != d.date.getTime()) {
               var sccase = new Object();
-              sccase.date = d.date, sccase.vote = 0, sccase.totalvotes = 1;
+              sccase.date = d.date, sccase.vote = 0, sccase.totalvotes = 1, sccase.split = 0, sccase.splittotals = 0;
               if (d.vote == 1 || d.vote == 3 || d.vote == 4) //only count consents
                 sccase.vote += 1;
+              if (d.majVotes == 5 && d.minVotes == 4) {
+                if (d.vote == 1 || d.vote == 3 || d.vote == 4) //only count consents
+                  sccase.split += 1;
+                sccase.splittotals += 1;
+              }
               data[data.length] = sccase;
             }
             else {
-              data[data.length-1].totalvotes += 1;
+              var sccase = data[data.length-1];
+              sccase.totalvotes += 1;
               if (d.vote == 1 || d.vote == 3 || d.vote == 4) //only count consents
-                data[data.length-1].vote += 1;
+                sccase.vote += 1;
+              if (d.majVotes == 5 && d.minVotes == 4) {
+                if (d.vote == 1 || d.vote == 3 || d.vote == 4) //only count consents
+                  sccase.split += 1;
+                sccase.splittotals += 1;
+              }
             }
           });
+          justices.map(function (j){j.values.map(function (d){
+            d.percent=100*d.vote/d.totalvotes;
+            d.splitpercent = 100*d.split/d.splittotals;
+            if (onlysplitdata) {
+              d.vote = d.split;
+              d.totalvotes = d.splittotals;
+              d.percent = d.splitpercent;              
+            }
+          })});
              
           // Scale the range of the data again 
           x.domain([
             d3.min(justices, function(c) { return d3.min(c.values, function(v) { if (v != null)return v.date; else return 9999 }); }),
             d3.max(justices, function(c) { return d3.max(c.values, function(v) { if (v != null) return v.date; else return 0; }); })
           ]);
-          y.domain([
-            d3.min(justices, function(c) { return d3.min(c.values, function(v) { if (v != null)return v.vote; else return 999 }); }),
-            d3.max(justices, function(c) { return d3.max(c.values, function(v) { if (v != null) return v.vote; else return 0; }); })
-          ]);
+          y.domain([0, 100 ]);
 
       // Select the section we want to apply our changes to
       var svgtrans = d3.select("body").transition();
@@ -303,7 +338,7 @@ function updateData() {
 
       justice.append("text")
           .datum(function(d) { return {name: d.name, value: d.values[d.values.length - 1]}; })
-          .attr("transform", function(d) { return "translate(" + x(d.value.date) + "," + y(d.value.vote) + ")"; })
+          .attr("transform", function(d) { return "translate(" + x(d.value.date) + "," + y(d.value.percent) + ")"; })
           .attr("x", 3)
           .attr("dy", ".35em")
           .text(function(d) { return d.name; });
@@ -312,21 +347,20 @@ function updateData() {
           .on("mousemove", mousemove);
       //try to just update the mousemove function in focus?
       function mousemove() {
-            console.log("kd");
         svg.selectAll('.focus').style("display", null);
         var x0 = x.invert(d3.mouse(this)[0]);
         for (var j = 0; j < justices.length; j++) {
             var i = bisectDate(justices[j].values, x0, 1),
             d0 = justices[j].values[i - 1],
             d1 = justices[j].values[i];
-            if (d0 == null || d1 == null || d0.vote == null || d1.vote == null
+            if (d0 == null || d1 == null || d0.percent == null || d1.percent == null
                     || x0 < justices[j].values[0].date) { 
                 svg.select('#'+justices[j].name).style("display", "none");
                 continue;
             }
             var d = x0 - d0.date > d1.date - x0 ? d1 : d0;
             var myfocus = svg.select("#"+justices[j].name);
-            myfocus.attr("transform", "translate(" + x(d.date) + "," + y(d.vote) + ")");
+            myfocus.attr("transform", "translate(" + x(d.date) + "," + y(d.percent) + ")");
             myfocus.select("text").text(formatHoverText(d, justices[j].name));
         }
       }
