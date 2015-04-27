@@ -1,6 +1,5 @@
 /*
-  call x and pass it the id of the selection box you want
-  autocomplete.html is a reference of how to set it up
+  call $("#yourselectid").combobox() to engage
 */
   (function($) {
     $.widget( "custom.combobox", {
