@@ -1,8 +1,8 @@
 var nodes = {};
 var namelist = {};
-var testcase = "JAMES GOMEZ AND DANIEL VASQUEZ v. UNITED STATES DISTRICT COURT FOR THE NORTHERN DISTRICT OF CALIFORNIA, et al."
+var testcase = "PLESSY v. FERGUSON, 163 U.S. 537 (1896)"
 function init() {
-  $.get("data/citations/nametooldcite.json", function (data) {
+  $.get("data/citations/allnamestocitations.json", function (data) {
       namelist = data;
       thislist = Object.keys(namelist);
       for (var i in thislist) {
@@ -16,12 +16,18 @@ queue()
     .defer(d3.json, "data/citations/citedby.json")
     .defer(d3.json, "data/citations/mastercaselist1890-pres.json")
     .defer(d3.json, "data/citations/oldstyletodocket.json")
-    .defer(d3.json, "data/citations/nametooldcite.json")
+    .defer(d3.json, "data/citations/allnamestocitations.json")
     .await(ready);
 
 function ready(error, theycite, citedby, oldtoname, oldtodockets, namestocites) {
 // testcase = $("#get-case").combobox().val();
-thiscase = namestocites[testcase]
+if(testcase in namestocites) { thiscase = namestocites[testcase] } else { 
+  bigregg = /\d{1,3}\s{1,3}U.S.(\s|,\sat\s)\d{1,4}/gi;
+  if(testcase.match(bigregg)) {
+        thiscase = testcase.match(bigregg)[0];
+        if(thiscase in theycite || thiscase in citedby) {} else {thiscase = "err";console.log(error)}
+  }
+}
 links = [];
   for(key in theycite[thiscase]){
         var temp = {}
@@ -46,7 +52,6 @@ links = [];
     link.source = nodes[link.source] || (nodes[link.source] = {name: link.source});
     link.target = nodes[link.target] || (nodes[link.target] = {name: link.target});
   });
-  // links.fixed=true;
   var width = 1000,
       height = 700;
 
@@ -54,7 +59,7 @@ links = [];
       .nodes(d3.values(nodes))
       .links(links)
       .size([width, height])
-      .linkDistance(150)
+      .linkDistance(200)
       .charge(-500)
       .on("tick", tick)
       .start();
@@ -87,7 +92,7 @@ links = [];
   var circle = svg.append("g").selectAll("circle")
       .data(force.nodes())
     .enter().append("circle")
-      .attr("r", 6)
+      .attr("r", 10)
       .call(force.drag()
         .on("dragstart",dragstart))
             .on("click", function(d) { 
@@ -97,18 +102,21 @@ links = [];
           testcase = mystr
         } else if (mystr in oldtoname) {
               testcase = oldtoname[mystr]
-            }
-        
-        // console.log(mystr)
-        // testcase = oldtoname[mystr]
-        // if(! testcase) {
-          // bigregg = /\d{1,3}\s{1,3}U.S.(\s|,\sat\s)\d{1,3}/gi; //same as from python code
-          // if(mystr.match(bigregg)) {
-          //   testcase = mystr.match(bigregg)[0]  //find the key for use in mastercaselist.json ERRORS HERE
-          // }
-        // }
+            } else {
+              try {
+                    bigregg = /\d{1,3}\s{1,3}U.S.(\s|,\sat\s)\d{1,4}/gi; //same as from python code
+                    if(mystr.match(bigregg)) {
+                        xx = mystr.match(bigregg)[0]  //find the key for use in mastercaselist.json ERRORS HERE
+                        if(xx in oldtoname) {
+                          testcase = oldtoname[xx]
+                        } else {
+                        }
+                    }
+              } catch(e) {
+                console.log(e)
+              }
+          }
         d3.select("svg").remove();          //remove the last graph viz
-        // svg.selectAll("*").remove();
         ready(error, theycite, citedby, oldtoname, oldtodockets, namestocites)       //call ready again to create the new one
       });
 
@@ -163,10 +171,11 @@ function dragstart(d) {
 
 function testme() {
   testcase = $("#get-case").combobox().val();
+  console.log(testcase)
   var nodes = {};
   var namelist = {};
   function init() {
-    $.get("data/citations/nametooldcite.json", function (data) {
+    $.get("data/citations/allnamestocitations.json", function (data) {
       namelist = data;
       thislist = Object.keys(namelist);
       for (var i in thislist) {
@@ -177,18 +186,24 @@ function testme() {
   d3.selectAll("circle").remove();
   d3.selectAll("text").remove();
   d3.selectAll("svg").remove();          //remove the last graph viz
-  d3.selectAll("canvass").remove();
+  // d3.selectAll("canvass").remove();
   queue()
     .defer(d3.json, "data/citations/theycite.json")
     .defer(d3.json, "data/citations/citedby.json")
     .defer(d3.json, "data/citations/mastercaselist1890-pres.json")
     .defer(d3.json, "data/citations/oldstyletodocket.json")
-    .defer(d3.json, "data/citations/nametooldcite.json")
+    .defer(d3.json, "data/citations/allnamestocitations.json")
     .await(ready);
 
 function ready(error, theycite, citedby, oldtoname, oldtodockets, namestocites) {
 // testcase = $("#get-case").combobox().val();
-thiscase = namestocites[testcase]
+if(testcase in namestocites) { console.log("good");thiscase = namestocites[testcase] } else { 
+  bigregg = /\d{1,3}\s{1,3}U.S.(\s|,\sat\s)\d{1,4}/gi;
+  if(testcase.match(bigregg)) {
+        thiscase = testcase.match(bigregg)[0];
+        if(thiscase in theycite || thiscase in citedby) {} else {thiscase = "err";console.log(error)}
+  }
+}
 links = [];
   for(key in theycite[thiscase]){
         var temp = {}
@@ -213,7 +228,6 @@ links = [];
     link.source = nodes[link.source] || (nodes[link.source] = {name: link.source});
     link.target = nodes[link.target] || (nodes[link.target] = {name: link.target});
   });
-links.fexed = true;
   var width = 1000,
       height = 700;
 
@@ -254,29 +268,35 @@ links.fexed = true;
   var circle = svg.append("g").selectAll("circle")
       .data(force.nodes())
     .enter().append("circle")
-      .attr("r", 6)
+      .attr("r", 10)
       .call(force.drag()
         .on("dragstart",dragstart))
             .on("click", function(d) { 
               // REDRAW GRAPH ON CLICK OF A CIRCLE
         var mystr = d.name;
         if(mystr in namestocites) {
+          console.log("good")
           testcase = mystr
-        } else {
-          if(mystr in oldtoname) {
+        } else if (mystr in oldtoname) {
+          console.log("ok")
               testcase = oldtoname[mystr]
-            }
-        }
-        // console.log(mystr)
-        // testcase = oldtoname[mystr]
-        // if(! testcase) {
-          // bigregg = /\d{1,3}\s{1,3}U.S.(\s|,\sat\s)\d{1,3}/gi; //same as from python code
-          // if(mystr.match(bigregg)) {
-          //   testcase = mystr.match(bigregg)[0]  //find the key for use in mastercaselist.json ERRORS HERE
-          // }
-        // }
+            } else {
+              try {
+                console.log("name is: " + mystr)
+                    bigregg = /\d{1,3}\s{1,3}U.S.(\s|,\sat\s)\d{1,4}/gi; //same as from python code
+                    if(mystr.match(bigregg)) {
+                        xx = mystr.match(bigregg)[0]  //find the key for use in mastercaselist.json ERRORS HERE
+                        console.log(xx)
+                        if(xx in oldtoname) {
+                          testcase = oldtoname[xx]
+                        } else {
+                        }
+                    }
+              } catch(e) {
+                console.log(e)
+              }
+          }
         d3.select("svg").remove();          //remove the last graph viz
-        // svg.selectAll("*").remove();
         ready(error, theycite, citedby, oldtoname, oldtodockets, namestocites)       //call ready again to create the new one
       });
 
