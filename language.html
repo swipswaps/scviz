@@ -8,17 +8,17 @@
     <meta name="author" content="">
     <title>Explore Language</title>
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet">
-    <link href="frontend/autocomplete.css" rel="stylesheet">
-    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+    <!-- <link href="frontend/autocomplete.css" rel="stylesheet"> -->
+    <!-- <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css"> -->
     <link href="frontend/style.css" rel="stylesheet">
     <link href="frontend/issues.css" rel="stylesheet">
       <script src="//code.jquery.com/jquery-1.10.2.js" ></script>
       <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js" ></script>
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js" ></script>
-      <script src="js/autocomplete.js" ></script>
+    <script src="js/autocomplete.js" ></script>
   </head>
 
-  <body onload="init()">
+  <body>
 
     <nav class="navbar navbar-inverse navbar-fixed-top">
       <div class="container">
@@ -36,17 +36,16 @@
       </div>
     </nav>
     <br><br>
-   <div class="row">
-    <div class="col-lg-6" style="margin-left:4.5%">
-    <div class="input-group">
-      <input type="text" class="form-control" aria-label="...">
-        </div><!-- /input-group -->
-      </div><!-- /.col-lg-6 -->
-    </div>
+    <div class="container">
+   <form>
+  <div class="form-group">
+    <label>Word Frequencies</label>
+    <input type="text" class="form-control" id="words" placeholder="Enter word or words" onkeydown="if (event.keyCode == 13){ready()}">
+  </div>
     <br>
     <div class="container center" id="visualize">
-      <button type="button" class="btn btn-default" onclick="updateData()">Visualize</button> 
-    </div>
+      <button type="button" class="btn btn-default" onclick="ready()">Visualize</button> 
+    </div></div>
     <div class="container">
       <script src="http://d3js.org/d3.v3.js" ></script>
       <script src="js/language.js" ></script>

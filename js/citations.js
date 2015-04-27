@@ -1,6 +1,6 @@
 var nodes = {};
 var namelist = {};
-var testcase = "RICHARD B. CHENEY, VICE PRESIDENT OF THE UNITED STATES, et al. v. UNITED STATES DISTRICT COURT FOR THE DISTRICT OF COLUMBIA et al."
+var testcase = "JAMES GOMEZ AND DANIEL VASQUEZ v. UNITED STATES DISTRICT COURT FOR THE NORTHERN DISTRICT OF CALIFORNIA, et al."
 function init() {
   $.get("data/citations/nametooldcite.json", function (data) {
       namelist = data;
@@ -22,7 +22,6 @@ queue()
 function ready(error, theycite, citedby, oldtoname, oldtodockets, namestocites) {
 // testcase = $("#get-case").combobox().val();
 thiscase = namestocites[testcase]
-console.log("in ready; case is " + testcase + ", or " + thiscase)
 links = [];
   for(key in theycite[thiscase]){
         var temp = {}
@@ -47,9 +46,9 @@ links = [];
     link.source = nodes[link.source] || (nodes[link.source] = {name: link.source});
     link.target = nodes[link.target] || (nodes[link.target] = {name: link.target});
   });
-  links.fixed=true;
+  // links.fixed=true;
   var width = 1000,
-      height = 600;
+      height = 700;
 
   var force = d3.layout.force()
       .nodes(d3.values(nodes))
@@ -89,20 +88,17 @@ links = [];
       .data(force.nodes())
     .enter().append("circle")
       .attr("r", 6)
-      .call(force.drag)
+      .call(force.drag()
+        .on("dragstart",dragstart))
             .on("click", function(d) { 
               // REDRAW GRAPH ON CLICK OF A CIRCLE
-        console.log(d.name + "<- dname")
         var mystr = d.name;
         if(mystr in namestocites) {
-          console.log("changing testcase to " + mystr)
           testcase = mystr
-        } else {
-          if(mystr in oldtoname) {
-            console.log("hi")
+        } else if (mystr in oldtoname) {
               testcase = oldtoname[mystr]
             }
-        }
+        
         // console.log(mystr)
         // testcase = oldtoname[mystr]
         // if(! testcase) {
@@ -127,24 +123,17 @@ links = [];
       .on("click", function(d){ //open link in new window -- need to fix this for cases after 1997!
         var mystr = d.name;
         var numlist = mystr.match(regg);
-        if(! numlist){
-          // console.log("hi")
+        if(! numlist){  //no easy citation -> link mapping
           try {
             lastpart = namestocites[mystr].split("U.S. ")[1]
             url = base + namestocites[mystr].substring(0,3) + "&invol=" + lastpart
-            // x = caselist.getKeyByValue(d.name)
-            // y = dockets[x]
-            // url = base + "000&invol=" + y
           }
           catch(e) {
-            try {
-              "poop" === undefined 
-            } catch(er) {
-            url = "http://findlaw.com"
+            url = "http://findlaw.com"  //ok, give up
           }
-          }
-        } 
-        else {
+        }
+        
+        else {  //easy!
           url = base + numlist[0] + "&invol=" + numlist[1];
         }
         window.open(url);
@@ -164,7 +153,9 @@ links = [];
         dr = Math.sqrt(dx * dx + dy * dy);
     return "M" + d.source.x + "," + d.source.y + "A" + dr + "," + dr + " 0 0,1 " + d.target.x + "," + d.target.y;
   }
-
+function dragstart(d) {
+  d3.select(this).classed("fixed", d.fixed = true);
+}
   function transform(d) {
     return "translate(" + d.x + "," + d.y + ")";
   }
@@ -198,7 +189,6 @@ function testme() {
 function ready(error, theycite, citedby, oldtoname, oldtodockets, namestocites) {
 // testcase = $("#get-case").combobox().val();
 thiscase = namestocites[testcase]
-console.log("in ready; case is " + testcase + ", or " + thiscase)
 links = [];
   for(key in theycite[thiscase]){
         var temp = {}
@@ -225,13 +215,13 @@ links = [];
   });
 links.fexed = true;
   var width = 1000,
-      height = 600;
+      height = 700;
 
   var force = d3.layout.force()
       .nodes(d3.values(nodes))
       .links(links)
       .size([width, height])
-      .linkDistance(150)
+      .linkDistance(200)
       .charge(-300)
       .on("tick", tick)
       .start();
@@ -265,17 +255,15 @@ links.fexed = true;
       .data(force.nodes())
     .enter().append("circle")
       .attr("r", 6)
-      .call(force.drag)
+      .call(force.drag()
+        .on("dragstart",dragstart))
             .on("click", function(d) { 
               // REDRAW GRAPH ON CLICK OF A CIRCLE
-        console.log(d.name + "<- dname")
         var mystr = d.name;
         if(mystr in namestocites) {
-          console.log("changing testcase to " + mystr)
           testcase = mystr
         } else {
           if(mystr in oldtoname) {
-            console.log("hi")
               testcase = oldtoname[mystr]
             }
         }
@@ -303,24 +291,17 @@ links.fexed = true;
       .on("click", function(d){ //open link in new window -- need to fix this for cases after 1997!
         var mystr = d.name;
         var numlist = mystr.match(regg);
-        if(! numlist){
-          // console.log("hi")
+        if(! numlist){  //no easy citation -> link mapping
           try {
             lastpart = namestocites[mystr].split("U.S. ")[1]
             url = base + namestocites[mystr].substring(0,3) + "&invol=" + lastpart
-            // x = caselist.getKeyByValue(d.name)
-            // y = dockets[x]
-            // url = base + "000&invol=" + y
           }
           catch(e) {
-            try {
-              "poop" === undefined 
-            } catch(er) {
-            url = "http://findlaw.com"
+            url = "http://findlaw.com"  //ok, give up
           }
-          }
-        } 
-        else {
+        }
+        
+        else {  //easy!
           url = base + numlist[0] + "&invol=" + numlist[1];
         }
         window.open(url);
@@ -341,7 +322,9 @@ links.fexed = true;
         dr = Math.sqrt(dx * dx + dy * dy);
     return "M" + d.source.x + "," + d.source.y + "A" + dr + "," + dr + " 0 0,1 " + d.target.x + "," + d.target.y;
   }
-
+function dragstart(d) {
+  d3.select(this).classed("fixed", d.fixed = true);
+}
   function transform(d) {
     return "translate(" + d.x + "," + d.y + ")";
   }

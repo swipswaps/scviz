@@ -1,16 +1,9 @@
-// queue()
-  // .defer(d3.json, "data/lang/wordfreqsfinal.json")
-  // .await(ready)
-
 var word1 = "civil"
 var word2 = "freedom"
 
-function ready(er, allfreqs) {
-  // for(year = 1991; year <2009; year++) {
-
-  // }
-
-
+function ready() {
+  wordss = $("#words").combobox().val();
+  console.log(wordss)
   var margin = {top: 20, right: 50, bottom: 30, left: 50},
     width = 960 - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom;
@@ -41,13 +34,19 @@ function ready(er, allfreqs) {
       .attr("height", height + margin.top + margin.bottom)
     .append("g")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-  d3.json("data/lang/wordfreqsfinal.json", function(err, data) {
-    data.forEach(function(d) {
-    
-    })
+  var wordFreqArr = wordss.split(', ')
+  if(typeof wordFreqArr === undefined) {
+    wordFreqArr = wordss.split(",")
   }
-
+  d3.json("data/lang/wordfreqsfinal.json", function(err, data) {
+      counts = new Object();
+      for(i in wordFreqArr) {
+        for(year=1991;year < 2009; year++) {
+            counts[year] = {};
+            counts[year][wordFreqArr[i]] = data[year][wordFreqArr[i]]
+        }
+        
+    }
+    console.log(counts)
+  });
 }
-
-ready();
