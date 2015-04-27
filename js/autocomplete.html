@@ -13,16 +13,16 @@
       for (var i = 0; i < 4; i++) {
         $('#combobox2').append('<option value="'+i+'">'+i+'</option>');
       }
+      $("#combobox2").combobox();
+      $("#combobox3").combobox();
     }
-    loadauto("combobox");
-    loadauto("combobox2");
   </script>
 </head>
 <body onload="init()">
  
 <div class="ui-widget">
   <label>Your preferred programming language: </label>
-  <select id="combobox">
+  <select id="combobox3">
     <option value="">Select one...</option>
     <option value="ActionScript">ActionScript</option>
     <option value="AppleScript">AppleScript</option>

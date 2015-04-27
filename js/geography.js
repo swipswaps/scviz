@@ -22,6 +22,15 @@ var issueKeys = {
 "Private Action":14,
 "All":15}
 
+
+function init() {
+  var listissues=["Criminal Procedure", "Civil Rights", "First Amendment", "Due Process", "Privacy", "Attorneys", "Unions", "Economic Activity", "Judicial Power", "Federalism", "Interstate Relations", "Federal Taxation", "Miscellaneous", "Private Action"]
+  for (var i in listissues) {
+    $('#get-issue').append('<option value="'+listissues[i]+'">'+listissues[i]+'</option>');
+  }
+}
+  $("#get-issue").combobox();
+
 var quantize = d3.scale.quantize()
     .domain([0, 250])
     .range(d3.range(9).map(function(i) { return "q" + i + "-9"; }));

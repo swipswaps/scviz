@@ -2,13 +2,12 @@
   call x and pass it the id of the selection box you want
   autocomplete.html is a reference of how to set it up
 */
-function loadauto(selectID) {
-  $.widget( "custom."+selectID, {
+  (function($) {
+    $.widget( "custom.combobox", {
       _create: function() {
         this.wrapper = $( "<span>" )
           .addClass( "custom-combobox" )
           .insertAfter( this.element );
- 
         this.element.hide();
         this._createAutocomplete();
         this._createShowAllButton();
@@ -129,11 +128,5 @@ function loadauto(selectID) {
         this.element.show();
       }
     });
+  })(jQuery);
  
-  $(function() {
-    $( "#"+selectID).combobox();
-    $( "#toggle" ).click(function() {
-      $( "#"+selectID).toggle();
-    });
-  });
-}

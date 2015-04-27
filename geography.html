@@ -9,13 +9,18 @@
     <!--- <link rel="icon" href="../../favicon.ico">  -->
 
     <title>Geography of the Court</title>
-
     <!-- Bootstrap core CSS -->
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet">
     <link href="frontend/geography.css" rel="stylesheet">
+    <!-- Autocomplete -->
+    <link href="frontend/autocomplete.css" rel="stylesheet">
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+    <script src="//code.jquery.com/jquery-1.10.2.min.js" ></script>
+    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.min.js" ></script>
+    <script src="js/autocomplete.js" ></script>
   </head>
 
-  <body>
+  <body onload="init()">
 
     <nav class="navbar navbar-inverse navbar-fixed-top">
       <div class="container">
@@ -36,6 +41,12 @@
     <br>
     <h2 style="text-align:center">Geography of the Court, 1946-Present</h2>
     <hr>
+    <div class="ui-widget" >
+      <label>Select an issue to inspect(leave blank for all issues)</label>
+      <select id="get-issue">
+        <option value="">Select one...</option>
+      </select>
+    </div>
     <div id="map" style="text-align:center">
     </div>
     <script src="http://d3js.org/d3.v3.min.js"></script>
