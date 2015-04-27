@@ -73,7 +73,6 @@ var issueKeys = {
   14:"Private Action"
 }
 
-var data = [];
 var margin = {top: 20, right: 50, bottom: 30, left: 50},
     width = 960 - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom;
@@ -152,10 +151,6 @@ d3.csv("data/justice-centered/SCDB_2014_01_justiceCentered_Vote.csv", function(e
     d.percent=100*d.vote/d.totalvotes;
     d.splitpercent = 100*d.split/d.splittotals;
   })});
-
-  data.sort(function(a, b) {
-    return a.date - b.date;
-  });
 
   color.domain(justices);
   x.domain([
