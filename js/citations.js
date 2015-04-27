@@ -10,6 +10,7 @@ function init() {
       }
   });
 }
+$("#get-case").combobox();
 
 queue()
     .defer(d3.json, "data/citations/theycite.json")
@@ -162,7 +163,7 @@ function dragstart(d) {
 }
 
 function testme() {
-  testcase = $("#get-case").combobox().val();
+  testcase = $("#get-case").val();
   var nodes = {};
   var namelist = {};
   function init() {
