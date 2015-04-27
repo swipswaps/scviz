@@ -9,7 +9,7 @@ var issueKeys = {
 "All":0,
 "Criminal Procedure":1, //florida has hella of this one
 "Civil Rights":2,
-"First Amendment":3,
+"First Amendment":3, //new hampshire has 7/15 cases of this
 "Due Process":4,
 "Privacy":5,
 "Attorneys":6,
