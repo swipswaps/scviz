@@ -1,8 +1,6 @@
 ### George Brown and Skyler Tom, Spring 2015
 ### COMP 150-VAN Final Project
-### Puts info into dataframe and writes to CSV
-### Nothing implemented yet
-
+### Scrape & create adj list for citation network
 ############################# LIBRARIES ##############################
 import re
 import numpy

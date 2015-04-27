@@ -1,9 +1,5 @@
-var word1 = "civil"
-var word2 = "freedom"
-
 function ready() {
   wordss = $("#words").combobox().val();
-  console.log(wordss)
   var margin = {top: 20, right: 50, bottom: 30, left: 50},
     width = 960 - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom;
@@ -35,7 +31,7 @@ function ready() {
     .append("g")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
   var wordFreqArr = wordss.split(', ')
-  if(typeof wordFreqArr === undefined) {
+  if(! wordFreqArr[1]) {
     wordFreqArr = wordss.split(",")
   }
   d3.json("data/lang/wordfreqsfinal.json", function(err, data) {
@@ -45,7 +41,6 @@ function ready() {
             counts[year] = {};
             counts[year][wordFreqArr[i]] = data[year][wordFreqArr[i]]
         }
-        
     }
     console.log(counts)
   });
