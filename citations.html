@@ -37,12 +37,15 @@
     </nav>
     <br><br>
     <!-- <div class="col-md-4"> -->
-      <div class="ui-widget" >
+      <div class="ui-widget" style="margin-left:4.5%">
       <label>Select a Case</label>
        <select id="get-case">
          <option value="">Select one...</option>
         </select>
-      </div>
+      </div><br>
+          <div class="container center" id="visualize">
+      <button type="button" class="btn btn-default" onclick="testme()">Visualize</button> 
+    </div>
     <!-- </div> -->
     <div class="container">
           <p>Outgoing (black) arrows represent cases that the given (center) case cites, and incoming (green) arrows represent cases that cite the given case. Click on the circles to redraw the graph based on another case.</p>
