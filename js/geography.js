@@ -29,7 +29,7 @@ function init() {
     $('#get-issue').append('<option value="'+listissues[i]+'">'+listissues[i]+'</option>');
   }
 }
-  $("#get-issue").combobox();
+$("#get-issue").combobox();
 
 var quantize = d3.scale.quantize()
     .domain([0, 250])
@@ -50,25 +50,46 @@ counts = {}
 queue()
   .defer(d3.json, "data/geog/us.json")
   .defer(d3.csv, "data/geog/issuesbyd3id.csv")
+  .defer(d3.csv, "data/geog/issuesbystate.csv")
   .await(ready)
-
-function ready(error, us, data) {
+var x ;
+function ready(error, us, data, statemapping) {
+  x = statemapping;
     for(i in data) {
       if(data[i].issueArea == issueKeys[issue] || issueKeys[issue] == 15) {
         if (data[i].id in counts) {
-          counts[data[i].id] += 1
+          counts[data[i].id].numcases += 1
         } else {
-          counts[data[i].id] = 1
+          counts[data[i].id] = {};
+          counts[data[i].id].numcases = 1
         }
       }
     }
+    statemapping.map(function(d){counts[d.id].name = d.state;});
     svg.append("g")
       .attr("class", "stateColors")
     .selectAll("path")
       .data(topojson.feature(us, us.objects.states).features)
     .enter().append("path")
-      .attr("class", function(d) { return quantize(counts[d.id]); })
-      .attr("d", path);
+      .attr("class", function(d) { if (counts[d.id] != null) return quantize(counts[d.id].numcases); })
+      .attr("d", path)
+      .on("mouseover", mouseOver).on("mouseout", mouseOut);
+    function mouseOver(d){
+      d3.select("#tooltip").transition().duration(200).style("opacity", .9);      
+      d3.select("#tooltip").html(toolTip(counts[d.id]))  
+        .style("left", (d3.event.pageX) + "px")     
+        .style("top", (d3.event.pageY - 28) + "px");
+    }
+    function mouseOut(){
+      d3.select("#tooltip").transition().duration(500).style("opacity", 0);      
+    }
 }
 
 d3.select(self.frameElement).style("height", height + "px");
+
+function toolTip(d){ /* function to create html content string in tooltip div. */
+    return "<h4>"+d.name+"</h4><table>"+
+      "<tr><td>Number of cases</td><td>"+d.numcases+"</td></tr>"+
+      "<tr><td>High</td><td>"+/*(d.high)+*/"</td></tr>"+
+      "</table>";
+}
