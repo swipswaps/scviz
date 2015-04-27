@@ -14,9 +14,7 @@
     <link href="frontend/issues.css" rel="stylesheet">
       <script src="//code.jquery.com/jquery-1.10.2.min.js" ></script>
       <script src="//code.jquery.com/ui/1.11.4/jquery-ui.min.js" ></script>
-    <!--script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js" ></script-->
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js" ></script>
-    <!--script src="js/typeahead.bundle.js" ></script-->
       <script src="js/autocomplete.js" ></script>
   </head>
 
@@ -38,32 +36,26 @@
       </div>
     </nav>
     <br><br>
-<!--    <div class="ui-widget">
-      <label>Enter a word or words separated by a comma</label>
-      <select id="combobox">
-        <option value="">Select one...</option>
-      </select>
-    </div> -->
-    <div class="ui-widget" >
+    <div class="container"><div class="ui-widget" style="margin-bottom:5px">
       <label>Select a Justice</label>
       <select id="get-name">
         <option value="">Select one...</option>
       </select>
     </div>
-    <div class="ui-widget" >
+    <div class="ui-widget" style="margin-bottom:5px">
       <label>Select a second Justice</label>
       <select id="get-name2">
         <option value="">Select one...</option>
       </select>
     </div>
-    <div class="ui-widget" >
+    <div class="ui-widget" style="margin-bottom:5px">
       <label>Select an issue to inspect(leave blank for all issues)</label>
       <select id="get-issue">
         <option value="">Select one...</option>
       </select>
     </div>
     <label>Only show 5-4 split data</label>
-    <input type="checkbox" id="splitdata" />
+    <input type="checkbox" id="splitdata" /></div>
     <br>
     <div class="container center" id="visualize">
       <button type="button" class="btn btn-default" onclick="updateData()">Visualize</button> 

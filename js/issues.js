@@ -177,7 +177,7 @@ d3.csv("data/justice-centered/SCDB_2014_01_justiceCentered_Vote.csv", function(e
       .attr("y", 6)
       .attr("dy", ".71em")
       .style("text-anchor", "end")
-      .text("Times voted with the majority");
+      .text("Percentage of votes with majority");
 
   var justice = svg.selectAll(".justice")
       .data(justices)
