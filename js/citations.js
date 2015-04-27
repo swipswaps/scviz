@@ -172,6 +172,7 @@ function dragstart(d) {
 
 function testme() {
   testcase = $("#get-case").val();
+  console.log(testcase)
   var nodes = {};
   var namelist = {};
   function init() {
@@ -197,11 +198,11 @@ function testme() {
 
 function ready(error, theycite, citedby, oldtoname, oldtodockets, namestocites) {
 // testcase = $("#get-case").combobox().val();
-if(testcase in namestocites) { console.log("good");thiscase = namestocites[testcase] } else { 
+if(testcase in namestocites) {thiscase = namestocites[testcase]; console.log(thiscase); } else { 
   bigregg = /\d{1,3}\s{1,3}U.S.(\s|,\sat\s)\d{1,4}/gi;
   if(testcase.match(bigregg)) {
         thiscase = testcase.match(bigregg)[0];
-        if(thiscase in theycite || thiscase in citedby) {} else {thiscase = "err";console.log(error)}
+        if(thiscase in theycite || thiscase in citedby) {} else {thiscase = "err";console.log("EER" + error)}
   }
 }
 links = [];
@@ -211,6 +212,7 @@ links = [];
         temp["target"] = oldtoname[theycite[thiscase][key]] || theycite[thiscase][key]
         temp["type"] = "suit"
         if(temp["source"] != temp["target"]){       //no case cites itself!!
+            console.log(temp["target"])
             links.push(temp)
           }
   }
@@ -275,18 +277,14 @@ links = [];
               // REDRAW GRAPH ON CLICK OF A CIRCLE
         var mystr = d.name;
         if(mystr in namestocites) {
-          console.log("good")
           testcase = mystr
         } else if (mystr in oldtoname) {
-          console.log("ok")
               testcase = oldtoname[mystr]
             } else {
               try {
-                console.log("name is: " + mystr)
                     bigregg = /\d{1,3}\s{1,3}U.S.(\s|,\sat\s)\d{1,4}/gi; //same as from python code
                     if(mystr.match(bigregg)) {
                         xx = mystr.match(bigregg)[0]  //find the key for use in mastercaselist.json ERRORS HERE
-                        console.log(xx)
                         if(xx in oldtoname) {
                           testcase = oldtoname[xx]
                         } else {
