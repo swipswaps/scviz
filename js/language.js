@@ -1,41 +1,45 @@
 //$("#words").combobox();
-  var margin = {top: 20, right: 50, bottom: 30, left: 50},
-    width = 960 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom;
+// should have parsed json to be case insensitive
+var margin = {top: 20, right: 50, bottom: 30, left: 50},
+  width = 960 - margin.left - margin.right,
+  height = 500 - margin.top - margin.bottom;
 
-  var parseDate = d3.time.format("%Y").parse,
-  bisectDate = d3.bisector(function(d) { return d.date; }).left,
-  formatHoverText = function (d, name) {
-    return name + " appeared " + d.num + " times in " + d.date.getFullYear();
-  };
-  var charted = false;
+var parseDate = d3.time.format("%Y").parse,
+bisectDate = d3.bisector(function(d) { return d.date; }).left,
+formatHoverText = function (d, name) {
+  return name + " appeared " + d.num + " times in " + d.date.getFullYear();
+};
+var charted = false;
 
-  var x = d3.time.scale()
-    .range([0, width]);
+var x = d3.time.scale()
+  .range([0, width]);
 
-  var y = d3.scale.linear()
-      .range([height, 0]);
+var y = d3.scale.linear()
+    .range([height, 0]);
 
-  var color = d3.scale.category10();
+var color = d3.scale.category10();
 
-  var xAxis = d3.svg.axis()
-      .scale(x)
-      .orient("bottom");
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom");
 
-  var yAxis = d3.svg.axis()
-      .scale(y)
-      .orient("left");
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left");
 
-  var line = d3.svg.line()
-      //.defined(function(d){return d.num != null})
-      .x(function(d) { return x(d.date); })
-      .y(function(d) { return y(d.num); });
+var line = d3.svg.line()
+    //.defined(function(d){return d.num != null})
+    .x(function(d) { return x(d.date); })
+    .y(function(d) { return y(d.num); });
 
-  var svg = d3.select("body").append("svg")
-      .attr("width", width + margin.left + margin.right)
-      .attr("height", height + margin.top + margin.bottom)
-    .append("g")
-      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+$("#words").val("gay, same-sex, marriage");
+ready();
 
 function ready() {
   if (charted) {

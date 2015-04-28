@@ -27,7 +27,7 @@ function init() {
 
 $("#get-name").combobox();
 $("#get-name2").combobox();
-$("#get-issue").combobox();
+//$("#get-issue").combobox();
 
 var justices;
 /* 
@@ -39,7 +39,7 @@ $('#dropdownList li').on('click', function() {
 */
 
 var justice_names = 
-['JGRoberts', 'AFortas'];
+['RBGinsburg', 'AScalia'];
 
 
 var issueKeys = {
