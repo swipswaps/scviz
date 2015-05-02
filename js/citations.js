@@ -1,6 +1,6 @@
 var nodes = {};
 var namelist = {};
-var testcase = "PLESSY v. FERGUSON, 163 U.S. 537 (1896)"
+var testcase = "LAURENCE M. POWELL v. UNITED STATES"
 function init() {
   $.get("data/citations/allnamestocitations.json", function (data) {
       namelist = data;
