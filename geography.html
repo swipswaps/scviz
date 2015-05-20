@@ -12,12 +12,7 @@
     <!-- Bootstrap core CSS -->
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet">
     <link href="frontend/geography.css" rel="stylesheet">
-    <!-- Autocomplete -->
-    <link href="frontend/autocomplete.css" rel="stylesheet">
-    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
     <script src="//code.jquery.com/jquery-1.10.2.min.js" ></script>
-    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.min.js" ></script>
-    <script src="js/autocomplete.js" ></script>
   </head>
 
   <body onload="init()">
@@ -40,20 +35,20 @@
     <br>
     <br>
     <div class="container">
-    <h2 style="text-align:center">Geography of the Court, 1946-Present</h2>
-    <hr>
-    <div class="ui-widget" >
-      <label>Select an issue to inspect</label>
-      <select id="get-issue">
-        <option value="">Select one...</option>
-      </select>
-    </div>
-    <div id="tooltip"></div><!-- div to hold tooltip. -->
-    <div id="map" style="text-align:center"></div>
-    <script src="http://d3js.org/d3.v3.min.js"></script>
-    <script src="http://d3js.org/topojson.v1.min.js"></script>
-    <script src="http://d3js.org/queue.v1.min.js"></script>
-    <script type="text/javascript" src="js/geography.js"></script>
+      <h2 style="text-align:center">Geography of the Court, 1946-Present</h2>
+      <hr>
+      <div class="ui-widget" >
+        <label>Select an issue to inspect</label>
+        <select id="get-issue">
+          <option value="">Select one...</option>
+        </select>
+      </div>
+      <div id="tooltip"></div><!-- div to hold tooltip. -->
+      <div id="map" style="text-align:center"></div>
+      <script src="http://d3js.org/d3.v3.min.js"></script>
+      <script src="http://d3js.org/topojson.v1.min.js"></script>
+      <script src="http://d3js.org/queue.v1.min.js"></script>
+      <script type="text/javascript" src="js/geography.js"></script>
       <br>
       <h2 style="text-align:center">Colored by percentage of cases per issue versus total cases form the state</h2>
 

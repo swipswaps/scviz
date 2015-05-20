@@ -1,6 +1,4 @@
-/*
-  call $("#yourselectid").combobox() to engage
-*/
+/* call $("#yourselectid").combobox() to engage */
   (function($) {
     $.widget( "custom.combobox", {
       _create: function() {

@@ -1,10 +1,6 @@
 /* TODO
- * change to percentages
- * try to get the dropdown menu on the autofill to be there
  * Error check for bad input from user
- * write a little blurb about what this does at the top
  * transition lines?
- * check how much faster it is to use the parsed files by judge
  * extra:
  * add ability to look at multiple issues
  * add ability to look at it by court (roberts court, Rehnquist court)
@@ -27,51 +23,13 @@ function init() {
 
 $("#get-name").combobox();
 $("#get-name2").combobox();
-//$("#get-issue").combobox();
 
 var justices;
-/* 
- *from old issue drop down
-$('.dropdown-toggle').dropdown();
-$('#dropdownList li').on('click', function() {
-    $('#dropdownMenu1').html($(this).html());
-});
-*/
 
 var justice_names = 
 ['RBGinsburg', 'AScalia'];
 
-
-var issueKeys = {
-  "Criminal Procedure":1,
-  "Civil Rights":2,
-  "First Amendment":3,
-  "Due Process":4,
-  "Privacy":5,
-  "Attorneys":6,
-  "Unions":7,
-  "Economic Activity":8,
-  "Judicial Power":9,
-  "Federalism":10,
-  "Interstate Relations":11,
-  "Federal Taxation":12,
-  "Miscellaneous":13,
-  "Private Action":14,
-  1:"Criminal Procedure",
-  2:"Civil Rights",
-  3:"First Amendment",
-  4:"Due Process",
-  5:"Privacy",
-  6:"Attorneys",
-  7:"Unions",
-  8:"Economic Activity",
-  9:"Judicial Power",
-  10:"Federalism",
-  11:"Interstate Relations",
-  12:"Federal Taxation",
-  13:"Miscellaneous",
-  14:"Private Action"
-}
+var issueKeys = {"Criminal Procedure":1, "Civil Rights":2, "First Amendment":3, "Due Process":4, "Privacy":5, "Attorneys":6, "Unions":7, "Economic Activity":8, "Judicial Power":9, "Federalism":10, "Interstate Relations":11, "Federal Taxation":12, "Miscellaneous":13, "Private Action":14, 1:"Criminal Procedure", 2:"Civil Rights", 3:"First Amendment", 4:"Due Process", 5:"Privacy", 6:"Attorneys", 7:"Unions", 8:"Economic Activity", 9:"Judicial Power", 10:"Federalism", 11:"Interstate Relations", 12:"Federal Taxation", 13:"Miscellaneous", 14:"Private Action"}
 
 var margin = {top: 20, right: 50, bottom: 30, left: 50},
     width = 960 - margin.left - margin.right,
@@ -110,43 +68,20 @@ var svg = d3.select("body").append("svg")
     .attr("height", height + margin.top + margin.bottom)
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+queue()
+  .defer(d3.csv, "data/justice-centered/justicevotes/"+justice_names[0]+".csv")
+  .defer(d3.csv, "data/justice-centered/justicevotes/"+justice_names[1]+".csv")
+  .await(ready)
 
-d3.csv("data/justice-centered/SCDB_2014_01_justiceCentered_Vote.csv", function(error, csv_data) {
+function ready(error, j0data, j1data) {
   justices = [];
   for (var i = 0; i < justice_names.length; i++) {
     justices[i] = new Object();
     justices[i].name = justice_names[i];
     justices[i].values = [];
   }
-  csv_data.forEach(function(d) {
-    if (d.justiceName !== justices[0].name && d.justiceName !== justices[1].name) return 1;
-    d.date = parseDate(d.term);
-    d.vote = +d.vote;
-    var data = d.justiceName == justices[0].name ? justices[0].values : justices[1].values;
-    if (data.length == 0 || data[data.length-1].date.getTime() != d.date.getTime()) {
-      var sccase = new Object();
-      sccase.date = d.date, sccase.vote = 0, sccase.totalvotes = 1, sccase.split = 0, sccase.splittotals = 0;
-      if (d.vote == 1 || d.vote == 3 || d.vote == 4) //only count consents
-        sccase.vote += 1;
-      if (d.majVotes == 5 && d.minVotes == 4) {
-        if (d.vote == 1 || d.vote == 3 || d.vote == 4) //only count consents
-          sccase.split += 1;
-        sccase.splittotals += 1;
-      }
-      data[data.length] = sccase;
-    }
-    else {
-      var sccase = data[data.length-1];
-      sccase.totalvotes += 1;
-      if (d.vote == 1 || d.vote == 3 || d.vote == 4) //only count consents
-        sccase.vote += 1;
-      if (d.majVotes == 5 && d.minVotes == 4) {
-        if (d.vote == 1 || d.vote == 3 || d.vote == 4) //only count consents
-          sccase.split += 1;
-        sccase.splittotals += 1;
-      }
-    }
-  });
+  loadjustice(justices, j0data, 0, null);
+  loadjustice(justices, j1data, 1, null);
   justices.map(function (j){j.values.map(function (d){
     d.percent=100*d.vote/d.totalvotes;
     d.splitpercent = 100*d.split/d.splittotals;
@@ -229,73 +164,52 @@ d3.csv("data/justice-centered/SCDB_2014_01_justiceCentered_Vote.csv", function(e
         }
       }
   }
-});
+}
+
 // ** Update data section (Called from the onclick)
 function updateData() {
-    targetJustice = $("#get-name").val();
+    var targetJustice = $("#get-name").val();
     var tJexists = $.inArray(targetJustice, listjustices) > -1;
-    targetJustice2 = $("#get-name2").val();
+    var targetJustice2 = $("#get-name2").val();
     var tJexists2 = $.inArray(targetJustice2, listjustices) > -1;
-    targetissue = issueKeys[$("#get-issue").val()];
+    var targetissue = issueKeys[$("#get-issue").val()];
     var onlysplitdata = $("#splitdata").prop('checked');
-    //targetissue = issueKeys[$("#dropdownMenu1").text()];
+    if (!tJexists2) targetJustice2 = targetJustice;
     justice_names = [targetJustice, targetJustice2];
     // Load the new data
-    d3.csv("data/justice-centered/SCDB_2014_01_justiceCentered_Vote.csv", function(error, csv_data) {
-          justices = [];
-          for (var i = 0; i < justice_names.length; i++) {
-            justices[i] = new Object();
-            justices[i].name = justice_names[i];
-            justices[i].values = [];
-          }
-          color.domain(justices);
-          csv_data.forEach(function(d) {
-            if (tJexists && d.justiceName !== justices[0].name &&
-                tJexists2 && d.justiceName !== justices[1].name) return 1;
-            if (targetissue != null && +d.issueArea != targetissue) return 1;
-            d.date = parseDate(d.term);
-            d.vote = +d.vote;
-            var data = d.justiceName == justices[0].name ? justices[0].values : justices[1].values;
-            if (data.length == 0 || data[data.length-1].date.getTime() != d.date.getTime()) {
-              var sccase = new Object();
-              sccase.date = d.date, sccase.vote = 0, sccase.totalvotes = 1, sccase.split = 0, sccase.splittotals = 0;
-              if (d.vote == 1 || d.vote == 3 || d.vote == 4) //only count consents
-                sccase.vote += 1;
-              if (d.majVotes == 5 && d.minVotes == 4) {
-                if (d.vote == 1 || d.vote == 3 || d.vote == 4) //only count consents
-                  sccase.split += 1;
-                sccase.splittotals += 1;
-              }
-              data[data.length] = sccase;
-            }
-            else {
-              var sccase = data[data.length-1];
-              sccase.totalvotes += 1;
-              if (d.vote == 1 || d.vote == 3 || d.vote == 4) //only count consents
-                sccase.vote += 1;
-              if (d.majVotes == 5 && d.minVotes == 4) {
-                if (d.vote == 1 || d.vote == 3 || d.vote == 4) //only count consents
-                  sccase.split += 1;
-                sccase.splittotals += 1;
-              }
-            }
-          });
-          justices.map(function (j){j.values.map(function (d){
-            d.percent=100*d.vote/d.totalvotes;
-            d.splitpercent = 100*d.split/d.splittotals;
-            if (onlysplitdata) {
-              d.vote = d.split;
-              d.totalvotes = d.splittotals;
-              d.percent = d.splitpercent;              
-            }
-          })});
-             
-          // Scale the range of the data again 
-          x.domain([
-            d3.min(justices, function(c) { return d3.min(c.values, function(v) { if (v != null)return v.date; else return 9999 }); }),
-            d3.max(justices, function(c) { return d3.max(c.values, function(v) { if (v != null) return v.date; else return 0; }); })
-          ]);
-          y.domain([0, 100 ]);
+    queue()
+      .defer(d3.csv, "data/justice-centered/justicevotes/"+justice_names[0]+".csv")
+      .defer(d3.csv, "data/justice-centered/justicevotes/"+justice_names[1]+".csv")
+      .await(ready)
+    function ready(error, j0data, j1data) {
+      b1 = j0data;
+      b2 = j1data;
+      t1 = targetissue;
+      justices = [];
+      for (var i = 0; i < justice_names.length; i++) {
+        justices[i] = new Object();
+        justices[i].name = justice_names[i];
+        justices[i].values = [];
+      }
+      color.domain(justices);
+      loadjustice(justices, j0data, 0, targetissue);
+      loadjustice(justices, j1data, 1, targetissue);
+      justices.map(function (j){j.values.map(function (d){
+        d.percent=100*d.vote/d.totalvotes;
+        d.splitpercent = 100*d.split/d.splittotals;
+        if (onlysplitdata) {
+          d.vote = d.split;
+          d.totalvotes = d.splittotals;
+          d.percent = d.splitpercent;              
+        }
+      })});
+         
+      // Scale the range of the data again 
+      x.domain([
+        d3.min(justices, function(c) { return d3.min(c.values, function(v) { if (v != null)return v.date; else return 9999 }); }),
+        d3.max(justices, function(c) { return d3.max(c.values, function(v) { if (v != null) return v.date; else return 0; }); })
+      ]);
+      y.domain([0, 100 ]);
 
       // Select the section we want to apply our changes to
       var svgtrans = d3.select("body").transition();
@@ -359,5 +273,37 @@ function updateData() {
             myfocus.select("text").text(formatHoverText(d, justices[j].name));
         }
       }
-    });
+    }
+}
+
+function loadjustice(justices, csvdata, num, issue) {
+  csvdata.map(function(d) {
+    if (issue != null && +d.issueArea != issue) return 1;
+    d.date = parseDate(d.term);
+    d.vote = +d.vote;
+    var data = justices[num].values;
+    if (data.length == 0 || data[data.length-1].date.getTime() != d.date.getTime()) {
+      var sccase = new Object();
+      sccase.date = d.date, sccase.vote = 0, sccase.totalvotes = 1, sccase.split = 0, sccase.splittotals = 0;
+      if (d.vote == 1 || d.vote == 3 || d.vote == 4) //only count consents
+        sccase.vote += 1;
+      if (d.majVotes == 5 && d.minVotes == 4) {
+        if (d.vote == 1 || d.vote == 3 || d.vote == 4) //only count consents
+          sccase.split += 1;
+        sccase.splittotals += 1;
+      }
+      data[data.length] = sccase;
+    }
+    else {
+      var sccase = data[data.length-1];
+      sccase.totalvotes += 1;
+      if (d.vote == 1 || d.vote == 3 || d.vote == 4) //only count consents
+        sccase.vote += 1;
+      if (d.majVotes == 5 && d.minVotes == 4) {
+        if (d.vote == 1 || d.vote == 3 || d.vote == 4) //only count consents
+          sccase.split += 1;
+        sccase.splittotals += 1;
+      }
+    }
+  });
 }
